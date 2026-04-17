@@ -8,6 +8,11 @@ version = '1.0.0'
 def allureVersion = '2.32.0'
 def aspectJVersion = '1.9.22'
 def junitVersion = '6.0.2'
+def selenideVersion = '7.13.0'
+def fakerVersion = '1.0.2'
+def springJdbcVersion = '6.2.12'
+def mySqlConnectorVersion = '8.0.33'
+def snakeYamlVersion = '1.33'
 
 configurations {
     agent {
@@ -16,14 +21,35 @@ configurations {
     }
 }
 
-dependencies {
-    agent "org.aspectj:aspectjweaver:$aspectJVersion"
+configurations.configureEach {
+    resolutionStrategy {
+        force 'org.yaml:snakeyaml:1.33'
+    }
+}
 
+dependencies {
+    // WEB
+    testImplementation "com.codeborne:selenide:${selenideVersion}"
+
+    // Allure
     testImplementation platform("io.qameta.allure:allure-bom:$allureVersion")
     testImplementation "io.qameta.allure:allure-junit5"
+    agent "org.aspectj:aspectjweaver:$aspectJVersion"
 
+    // JUnit
     testImplementation platform("org.junit:junit-bom:$junitVersion")
     testImplementation "org.junit.jupiter:junit-jupiter"
+
+    // Utils
+    testImplementation "com.github.javafaker:javafaker:${fakerVersion}"
+    testImplementation "org.yaml:snakeyaml:${snakeYamlVersion}"
+
+    // DB
+    testImplementation "org.springframework:spring-jdbc:${springJdbcVersion}"
+    testImplementation "mysql:mysql-connector-java:${mySqlConnectorVersion}"
+
+    // Security
+    testImplementation("org.springframework.security:spring-security-crypto")
 }
 
 allure {
