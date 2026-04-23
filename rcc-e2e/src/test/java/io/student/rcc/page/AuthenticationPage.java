@@ -1,6 +1,7 @@
 package io.student.rcc.page;
 
 
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 import com.codeborne.selenide.SelenideElement;
@@ -26,7 +27,7 @@ public class AuthenticationPage {
   public AuthenticationPage incorrectLogin(String username, String password) {
     userNameInput.setValue(username);
     passwordInput.setValue(password);
-    incorrectDataError.isDisplayed();
+    incorrectDataError.shouldBe(visible);
 
     return this;
   }
