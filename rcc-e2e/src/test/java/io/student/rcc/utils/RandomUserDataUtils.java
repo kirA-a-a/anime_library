@@ -8,7 +8,7 @@ public class RandomUserDataUtils {
   private static final Faker faker = new Faker();
 
   public static String getRandomUserName() {
-    return faker.animal().name() + " " + UUID.randomUUID();
+    return faker.animal().name() + "_" + UUID.randomUUID();
   }
 
   public static String getRandomFirstName() {

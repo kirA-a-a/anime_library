@@ -28,8 +28,6 @@ public class UsersDbClient implements UsersClient {
         )
     );
 
-    final UUID userId = UUID.randomUUID();
-
     jdbcTemplate.update(
         con -> {
           PreparedStatement ps = con.prepareStatement(
@@ -48,7 +46,7 @@ public class UsersDbClient implements UsersClient {
     );
 
     return new UserJson(
-        userId,
+        UUID.randomUUID(),
         username,
         getRandomFirstName(),
         getRandomLastName(),

@@ -6,13 +6,13 @@ import static com.codeborne.selenide.Selenide.$;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
 
-public class AuthentificationPage {
+public class AuthenticationPage {
 
-  private final SelenideElement userNameInput = $(By.xpath("//input[@name='username']"));
-  private final SelenideElement passwordInput = $(By.xpath("//input[@name='password']"));
-  private final SelenideElement submitBtn = $(By.xpath("//button[@type='submit']"));
-  private final SelenideElement registrationBtn = $(By.xpath("//a[@href='/register']"));
-  private final SelenideElement incorrectDataError = $(By.xpath("//p[contains(@class, 'login__error')]"));
+  private final SelenideElement userNameInput = $("input[name='username']"),
+      passwordInput = $("input[name='password']"),
+      submitBtn = $("button[type='submit']"),
+      registrationBtn = $("a[href='/register']"),
+      incorrectDataError = $(By.xpath("//p[class*='login__error']"));
 
 
   public MainPage login(String username, String password) {
@@ -23,7 +23,7 @@ public class AuthentificationPage {
     return new MainPage();
   }
 
-  public AuthentificationPage incorrectLogin(String username, String password) {
+  public AuthenticationPage incorrectLogin(String username, String password) {
     userNameInput.setValue(username);
     passwordInput.setValue(password);
     incorrectDataError.isDisplayed();

@@ -25,12 +25,14 @@ public class RegistrationTest {
         .successRegistrationUser(userName, PASSWORD)
         .clickLoginButton()
         .login(userName, PASSWORD)
-        .checkTitle(TITLE);
+        .checkTitle(TITLE)
+        .clickInProfile()
+        .checkUserTag("@" + userName);
   }
 
   @Test
   @User
-  public void shouldNotRegisterUserWithExistingUsername(UserJson user) throws InterruptedException {
+  public void shouldNotRegisterUserWithExistingUsername(UserJson user) {
     Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .clickRegistrationButton()
@@ -64,5 +66,4 @@ public class RegistrationTest {
         .clickLoginButton()
         .incorrectLogin(user.username() + "Test", PASSWORD);
   }
-
 }

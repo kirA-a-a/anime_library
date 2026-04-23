@@ -2,7 +2,6 @@ package io.student.rcc.config;
 
 public enum LocalConfig implements  Config {
   INSTANCE;
-  ;
 
   @Override
   public String frontUrl() {

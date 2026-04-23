@@ -8,12 +8,12 @@ import org.openqa.selenium.By;
 
 public class RegistrationPage {
 
-  private final SelenideElement userNameInput = $(By.xpath("//input[@id='username']"));
-  private final SelenideElement passwordInput = $(By.xpath("//input[@id='password']"));
-  private final SelenideElement passwordSubmitInput = $(By.xpath("//input[@id='passwordSubmit']"));
-  private final SelenideElement submitBtn = $(By.xpath("//button[@type='submit']"));
-  private final SelenideElement signInBtn = $(By.xpath("//a[contains(text(), 'Войти в систему')]"));
-  private final SelenideElement userNameMessageError = $(By.xpath("//span[contains(@class, 'error__username')]"));
+  private final SelenideElement userNameInput = $("input[id='username']"),
+      passwordInput = $("input[id='password']"),
+      passwordSubmitInput = $("input[id='passwordSubmit']"),
+      submitBtn = $("button[type='submit']"),
+      signInBtn = $(By.xpath("//a[contains(text(), 'Войти в систему')]")),
+      userNameMessageError = $("span[class*='error__username')]");
 
   public MainPage successRegistrationUser(String userName, String password) {
     userNameInput.setValue(userName);
