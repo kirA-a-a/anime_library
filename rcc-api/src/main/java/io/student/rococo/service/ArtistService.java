@@ -35,6 +35,16 @@ public class ArtistService {
         Arrays.toString(entity.getPhoto() == null ? null : entity.getPhoto()));
   }
 
+  public Page<ArtistJson> getArtists(Pageable pageable) {
+    return artistRepository.findAll(pageable)
+        .map(e -> new ArtistJson(
+            e.getId(),
+            e.getName(),
+            e.getBiography(),
+            Arrays.toString(e.getPhoto() == null ? null : e.getPhoto())
+        ));
+  }
+
   public Page<ArtistJson> getArtistByName(Pageable pageable, String name) {
     return artistRepository.findByNameContainsIgnoreCase(name, pageable)
         .map(e -> new ArtistJson(

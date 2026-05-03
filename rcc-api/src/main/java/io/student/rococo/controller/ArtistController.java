@@ -28,6 +28,11 @@ public class ArtistController {
     this.artistService = artistService;
   }
 
+  @GetMapping
+  public Page<ArtistJson> getArtists(@PageableDefault Pageable pageable) {
+    return artistService.getArtists(pageable);
+  }
+
   @GetMapping("/{id}")
   public ArtistJson getArtistById(@PathVariable String id) {
     return artistService.getArtistById(id);
