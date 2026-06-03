@@ -36,21 +36,21 @@ public class UsersQueueExtension implements
   public static final Namespace NAMESPACE = Namespace.create(UsersQueueExtension.class);
 
   public record StaticUser(
-      String username, String password, String friend, String income, String outcome
+      String username, String password
   ) {
 
   }
 
   public static final Queue<StaticUser> EMPTY_USERS = new ConcurrentLinkedDeque<>();
   public static final Queue<StaticUser> WITH_FRIEND_USERS = new ConcurrentLinkedDeque<>();
-  public static final Queue<StaticUser> WITCH_INCOME_REQUEST_USERS = new ConcurrentLinkedDeque<>();
-  public static final Queue<StaticUser> WITCH_OUTCOME_REQUEST_USERS = new ConcurrentLinkedDeque<>();
+  public static final Queue<StaticUser> WITH_INCOME_REQUEST_USERS = new ConcurrentLinkedDeque<>();
+  public static final Queue<StaticUser> WITH_OUTCOME_REQUEST_USERS = new ConcurrentLinkedDeque<>();
 
   static {
-    EMPTY_USERS.add(new StaticUser("Ivan", "12345", null, null, null));
-    WITH_FRIEND_USERS.add(new StaticUser("Ivan2", "12345", "Ivan", null, null));
-    WITCH_INCOME_REQUEST_USERS.add(new StaticUser("admin", "12345", null, null, null));
-    WITCH_OUTCOME_REQUEST_USERS.add(new StaticUser("poopa", "12345", null, null, null));
+    EMPTY_USERS.add(new StaticUser("Ivan", "12345"));
+    WITH_FRIEND_USERS.add(new StaticUser("Ivan2", "12345"));
+    WITH_INCOME_REQUEST_USERS.add(new StaticUser("admin", "12345"));
+    WITH_OUTCOME_REQUEST_USERS.add(new StaticUser("poopa", "12345"));
   }
 
   @Retention(RetentionPolicy.RUNTIME)
@@ -61,7 +61,7 @@ public class UsersQueueExtension implements
     Type value() default Type.EMPTY;
 
     enum Type {
-      EMPTY, WITH_FRIEND, WITCH_INCOME_REQUEST, WITCH_OUTCOME_REQUEST
+      EMPTY, WITH_FRIEND, WITH_INCOME_REQUEST, WITH_OUTCOME_REQUEST
     }
 
   }
@@ -83,8 +83,8 @@ public class UsersQueueExtension implements
             user = switch (annotation.value()) {
               case EMPTY -> Optional.ofNullable(EMPTY_USERS.poll());
               case WITH_FRIEND -> Optional.ofNullable(WITH_FRIEND_USERS.poll());
-              case WITCH_INCOME_REQUEST -> Optional.ofNullable(WITCH_INCOME_REQUEST_USERS.poll());
-              case WITCH_OUTCOME_REQUEST -> Optional.ofNullable(WITCH_OUTCOME_REQUEST_USERS.poll());
+              case WITH_INCOME_REQUEST -> Optional.ofNullable(WITH_INCOME_REQUEST_USERS.poll());
+              case WITH_OUTCOME_REQUEST -> Optional.ofNullable(WITH_OUTCOME_REQUEST_USERS.poll());
             };
           }
 
@@ -118,8 +118,8 @@ public class UsersQueueExtension implements
       switch (ut.value()) {
         case Type.EMPTY -> EMPTY_USERS.add(u);
         case Type.WITH_FRIEND -> WITH_FRIEND_USERS.add(u);
-        case Type.WITCH_INCOME_REQUEST -> WITCH_INCOME_REQUEST_USERS.add(u);
-        case Type.WITCH_OUTCOME_REQUEST -> WITCH_OUTCOME_REQUEST_USERS.add(u);
+        case Type.WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST_USERS.add(u);
+        case Type.WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST_USERS.add(u);
       }
 
     }
