@@ -10,4 +10,5 @@ public interface Config {
   String userJdbcUrl();
   String dbUserName();
   String dbPassword();
+  String ghUrl();
 }
