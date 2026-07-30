@@ -1,6 +1,6 @@
 package io.student.rcc.config;
 
-public enum LocalConfig implements  Config {
+public enum LocalConfig implements Config {
   INSTANCE;
 
   @Override
@@ -9,7 +9,12 @@ public enum LocalConfig implements  Config {
   }
 
   @Override
-  public String userJdbcUrl() {
+  public String rccApiJdbcUrl() {
+    return "jdbc:mysql://localhost:3306/rococo-api?serverTimezone=UTC&createDatabaseIfNotExist=true";
+  }
+
+  @Override
+  public String authJdbcUrl() {
     return "jdbc:mysql://localhost:3306/rococo-auth?serverTimezone=UTC&createDatabaseIfNotExist=true";
   }
 
