@@ -21,7 +21,7 @@ public class UsersDbClient implements UsersClient {
   public UserJson createUser(String username, String password) {
     final JdbcTemplate jdbcTemplate = new JdbcTemplate(
         new SingleConnectionDataSource(
-            CFG.userJdbcUrl(),
+            CFG.authJdbcUrl(),
             CFG.dbUserName(),
             CFG.dbPassword(),
             false
@@ -31,7 +31,7 @@ public class UsersDbClient implements UsersClient {
     jdbcTemplate.update(
         con -> {
           PreparedStatement ps = con.prepareStatement(
-              "INSERT INTO user "
+              "INSERT INTO `user` "
                   + "(username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)"
                   + " VALUES (?, ?, ?, ?, ?, ?)"
           );

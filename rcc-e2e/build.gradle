@@ -35,6 +35,7 @@ dependencies {
     testImplementation platform("io.qameta.allure:allure-bom:$allureVersion")
     testImplementation "io.qameta.allure:allure-junit5"
     agent "org.aspectj:aspectjweaver:$aspectJVersion"
+    testImplementation "io.qameta.allure:allure-selenide"
 
     // JUnit
     testImplementation platform("org.junit:junit-bom:$junitVersion")
@@ -47,9 +48,19 @@ dependencies {
     // DB
     testImplementation "org.springframework:spring-jdbc:${springJdbcVersion}"
     testImplementation "mysql:mysql-connector-java:${mySqlConnectorVersion}"
+    testImplementation "com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11"
 
     // Security
     testImplementation("org.springframework.security:spring-security-crypto")
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.11.0'
+
+
+    // Lombok
+    testCompileOnly 'org.projectlombok:lombok:1.18.36'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 }
 
 allure {
