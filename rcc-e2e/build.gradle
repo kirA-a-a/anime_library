@@ -12,6 +12,9 @@ def selenideVersion = '7.13.0'
 def fakerVersion = '1.0.2'
 def springJdbcVersion = '6.2.12'
 def mySqlConnectorVersion = '8.0.33'
+def atomikosVersion = '6.0.0'
+def p6spyVersion = '3.9.1'
+def hibernateVersion = '6.6.0.Final'
 def snakeYamlVersion = '1.33'
 
 configurations {
@@ -49,6 +52,13 @@ dependencies {
     testImplementation "org.springframework:spring-jdbc:${springJdbcVersion}"
     testImplementation "mysql:mysql-connector-java:${mySqlConnectorVersion}"
     testImplementation "com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11"
+
+    // XA / JTA (Atomikos)
+    testImplementation "com.atomikos:transactions-jta:${atomikosVersion}:jakarta"
+    testImplementation "com.atomikos:transactions-hibernate4:${atomikosVersion}:jakarta"
+    testImplementation "com.atomikos:transactions-jdbc:${atomikosVersion}"
+    testImplementation "p6spy:p6spy:${p6spyVersion}"
+    testImplementation "org.hibernate:hibernate-core:${hibernateVersion}"
 
     // Security
     testImplementation("org.springframework.security:spring-security-crypto")

@@ -1,8 +1,8 @@
 package io.student.rcc.service;
 
-import io.student.rcc.model.UserJson;
+import java.util.UUID;
 
 public interface UsersClient {
 
-  UserJson createUser(String username, String password);
+  UUID createUser(String username, String password);
 }

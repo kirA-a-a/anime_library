@@ -31,16 +31,18 @@ public class UserExtension implements BeforeEachCallback, ParameterResolver {
         User.class
     ).ifPresent(
         annotation -> {
+          String username = getRandomUserName();
+          UUID id = usersClient.createUser(username, DEFAULT_PASSWORD);
           UserJson user = new UserJson(
-              UUID.randomUUID(),
-              getRandomUserName(),
+              id,
+              username,
               getRandomFirstName(),
               getRandomLastName(),
               null
           );
           context.getStore(NAMESPACE).put(
               context.getUniqueId(),
-              usersClient.createUser(user.username(), DEFAULT_PASSWORD)
+              user
           );
         }
     );
