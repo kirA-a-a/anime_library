@@ -32,4 +32,14 @@ public enum LocalConfig implements Config {
   public String ghUrl() {
     return "https://api.github.com/";
   }
+
+  @Override
+  public String authUrl() {
+    return "http://localhost:9000/";
+  }
+
+  @Override
+  public String apiUrl() {
+    return "http://localhost:8080/";
+  }
 }

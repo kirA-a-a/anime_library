@@ -3,12 +3,14 @@ package io.student.rcc.service;
 import static io.student.rcc.data.Databases.xaTransaction;
 
 import io.student.rcc.config.Config;
+import io.student.rcc.data.Databases.XaConsumer;
 import io.student.rcc.data.Databases.XaFunction;
-import io.student.rcc.data.dao.AuthAuthorityJdbcDao;
-import io.student.rcc.data.dao.AuthUserJdbcDao;
-import io.student.rcc.data.dao.UserJdbcDao;
-import io.student.rcc.data.entity.AuthAuthorityEntity;
-import io.student.rcc.data.entity.UserEntity;
+import io.student.rcc.data.dao.rococoAuth.AuthAuthorityJdbcDao;
+import io.student.rcc.data.dao.rococoAuth.AuthUserJdbcDao;
+import io.student.rcc.data.dao.rococoAuth.UserJdbcDao;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
+import io.student.rcc.model.UserJson;
 import java.sql.Connection;
 import java.util.UUID;
 
@@ -43,6 +45,20 @@ public class UsersDbClient implements UsersClient {
           entity.setUsername(username);
           new UserJdbcDao(connection).create(entity);
           return authUserId;
+        }, CFG.rccApiJdbcUrl())
+    );
+  }
+
+  @Override
+  public void delete(UserJson user) {
+    xaTransaction(
+        Connection.TRANSACTION_READ_COMMITTED,
+        new XaConsumer(connection -> {
+          new AuthAuthorityJdbcDao(connection).deleteByUserId(user.id());
+          new AuthUserJdbcDao(connection).delete(user.id());
+        }, CFG.authJdbcUrl()),
+        new XaConsumer(connection -> {
+          new UserJdbcDao(connection).delete(UserEntity.fromJson(user));
         }, CFG.rccApiJdbcUrl())
     );
   }

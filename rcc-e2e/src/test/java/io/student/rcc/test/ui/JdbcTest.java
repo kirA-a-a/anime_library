@@ -1,6 +1,6 @@
 package io.student.rcc.test.ui;
 
-import static io.student.rcc.utils.RandomUserDataUtils.getRandomUserName;
+import static io.student.rcc.utils.RandomUserDataUtils.randomUserName;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,7 +34,7 @@ public class JdbcTest {
 
   @Test
   void shouldCreateUserInAuthDatabase() {
-    String username = getRandomUserName();
+    String username = randomUserName();
 
     UUID id = usersDbClient.createUser(username, PASSWORD);
 
@@ -52,7 +52,7 @@ public class JdbcTest {
   @ParameterizedTest
   @ValueSource(strings = {"read", "write"})
   void shouldCreateUserWithAuthorityInAuthDatabase(String authority) {
-    String username = getRandomUserName();
+    String username = randomUserName();
 
     UUID id = usersDbClient.createUser(authority, username, PASSWORD);
 

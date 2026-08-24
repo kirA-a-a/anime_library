@@ -12,4 +12,6 @@ public interface Config {
   String dbUserName();
   String dbPassword();
   String ghUrl();
+  String authUrl();
+  String apiUrl();
 }

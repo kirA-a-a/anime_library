@@ -1,6 +1,6 @@
-package io.student.rcc.data.dao;
+package io.student.rcc.data.dao.rococoAuth;
 
-import io.student.rcc.data.entity.AuthAuthorityEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -32,5 +32,17 @@ public class AuthAuthorityJdbcDao implements AuthAuthorityDao {
       throw new RuntimeException(e);
     }
     return entity;
+  }
+
+  @Override
+  public void deleteByUserId(UUID userId) {
+    try (PreparedStatement ps = connection.prepareStatement(
+        "DELETE FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)"
+    )) {
+      ps.setString(1, userId.toString());
+      ps.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

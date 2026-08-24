@@ -1,6 +1,6 @@
 package io.student.rcc.model;
 
-import io.student.rcc.data.entity.AuthAuthorityEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
 import java.util.UUID;
 
 public record AuthAuthorityJson(

@@ -1,4 +1,4 @@
-package io.student.rcc.data.dao;
+package io.student.rcc.data.dao.rococoAuth;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,5 +35,17 @@ public class AuthUserJdbcDao implements AuthUserDao {
       throw new RuntimeException(e);
     }
     return id;
+  }
+
+  @Override
+  public void delete(UUID id) {
+    try (PreparedStatement ps = connection.prepareStatement(
+        "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)"
+    )) {
+      ps.setString(1, id.toString());
+      ps.executeUpdate();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
