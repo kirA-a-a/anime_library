@@ -1,5 +1,6 @@
-package io.student.rcc.data.rococoApi;
+package io.student.rcc.data.rococoApi.impl;
 
+import io.student.rcc.data.rococoApi.MuseumDao;
 import io.student.rcc.data.rococoApi.entity.MuseumEntity;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

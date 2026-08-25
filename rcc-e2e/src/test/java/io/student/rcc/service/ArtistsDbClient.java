@@ -3,7 +3,7 @@ package io.student.rcc.service;
 import static io.student.rcc.data.Databases.transaction;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.rococoApi.ArtistJdbcDao;
+import io.student.rcc.data.rococoApi.impl.ArtistJdbcDao;
 import io.student.rcc.data.rococoApi.entity.ArtistEntity;
 import io.student.rcc.model.ArtistJson;
 import java.sql.Connection;

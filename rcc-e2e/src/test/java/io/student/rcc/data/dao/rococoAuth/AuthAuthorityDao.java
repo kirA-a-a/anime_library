@@ -5,8 +5,8 @@ import java.util.UUID;
 
 public interface AuthAuthorityDao {
 
-    AuthAuthorityEntity create(AuthAuthorityEntity entity);
+  AuthAuthorityEntity create(AuthAuthorityEntity entity);
 
-    void deleteByUserId(UUID userId);
+  void deleteByUserId(UUID userId);
 
 }

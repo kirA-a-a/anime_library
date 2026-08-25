@@ -3,7 +3,7 @@ package io.student.rcc.service;
 import static io.student.rcc.data.Databases.transaction;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.rococoApi.PaintingJdbcDao;
+import io.student.rcc.data.rococoApi.impl.PaintingJdbcDao;
 import io.student.rcc.data.rococoApi.entity.PaintingEntity;
 import io.student.rcc.model.PaintingJson;
 import java.sql.Connection;

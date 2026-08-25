@@ -1,5 +1,6 @@
-package io.student.rcc.data.dao.rococoAuth;
+package io.student.rcc.data.dao.rococoAuth.impl;
 
+import io.student.rcc.data.dao.rococoAuth.AuthAuthorityDao;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
