@@ -1,11 +1,12 @@
 package io.student.rcc.model;
 
 import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity.Authority;
 import java.util.UUID;
 
 public record AuthAuthorityJson(
     UUID userId,
-    String authority
+    Authority authority
 ) {
 
   public static AuthAuthorityJson fromEntity(AuthAuthorityEntity entity) {

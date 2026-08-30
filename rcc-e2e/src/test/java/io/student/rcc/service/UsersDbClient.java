@@ -9,6 +9,8 @@ import io.student.rcc.data.dao.rococoAuth.impl.AuthAuthorityJdbcDao;
 import io.student.rcc.data.dao.rococoAuth.impl.AuthUserJdbcDao;
 import io.student.rcc.data.dao.rococoAuth.impl.UserJdbcDao;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity.Authority;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
 import io.student.rcc.model.UserJson;
 import java.sql.Connection;
@@ -20,22 +22,34 @@ public class UsersDbClient implements UsersClient {
 
   @Override
   public UUID createUser(String username, String password) {
-    return createUser(null, username, password);
+    return createUser(username, password, new Authority[0]);
   }
 
-  public UUID createUser(String authority, String username, String password) {
+  public UUID createUser(String username, String password, Authority... authorities) {
     UUID authUserId = UUID.randomUUID();
 
     return xaTransaction(
         Connection.TRANSACTION_READ_COMMITTED,
         new XaFunction<>(connection -> {
-          new AuthUserJdbcDao(connection).createUser(authUserId, username, password);
+          AuthUserEntity authUser = new AuthUserEntity();
+          authUser.setId(authUserId);
+          authUser.setUsername(username);
+          authUser.setPassword(password);
+          authUser.setEnabled(true);
+          authUser.setAccountNonExpired(true);
+          authUser.setAccountNonLocked(true);
+          authUser.setCredentialsNonExpired(true);
+          new AuthUserJdbcDao(connection).create(authUser);
 
-          if (authority != null) {
-            AuthAuthorityEntity authorityEntity = new AuthAuthorityEntity();
-            authorityEntity.setUserId(authUserId);
-            authorityEntity.setAuthority(authority);
-            new AuthAuthorityJdbcDao(connection).create(authorityEntity);
+          if (authorities != null && authorities.length > 0) {
+            AuthAuthorityEntity[] entities = new AuthAuthorityEntity[authorities.length];
+            for (int i = 0; i < authorities.length; i++) {
+              AuthAuthorityEntity authorityEntity = new AuthAuthorityEntity();
+              authorityEntity.setUserId(authUserId);
+              authorityEntity.setAuthority(authorities[i]);
+              entities[i] = authorityEntity;
+            }
+            new AuthAuthorityJdbcDao(connection).create(entities);
           }
           return authUserId;
         }, CFG.authJdbcUrl()),

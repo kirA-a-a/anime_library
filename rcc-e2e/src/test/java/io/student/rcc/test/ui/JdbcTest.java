@@ -6,11 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.student.rcc.config.Config;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity.Authority;
 import io.student.rcc.service.UsersDbClient;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -50,17 +51,17 @@ public class JdbcTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"read", "write"})
-  void shouldCreateUserWithAuthorityInAuthDatabase(String authority) {
+  @EnumSource(Authority.class)
+  void shouldCreateUserWithAuthorityInAuthDatabase(Authority authority) {
     String username = randomUserName();
 
-    UUID id = usersDbClient.createUser(authority, username, PASSWORD);
+    UUID id = usersDbClient.createUser(username, PASSWORD, authority);
 
     AuthUserRow user = findUser(id);
     assertNotNull(id);
     assertEquals(username, user.username());
     assertTrue(passwordEncoder.matches(PASSWORD, user.password()));
-    assertEquals(authority, findAuthority(id));
+    assertEquals(authority.dbValue(), findAuthority(id));
   }
 
   private AuthUserRow findUser(UUID id) {

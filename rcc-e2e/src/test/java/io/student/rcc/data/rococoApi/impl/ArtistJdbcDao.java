@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,6 +57,25 @@ public class ArtistJdbcDao implements ArtistDao {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public List<ArtistEntity> findAll() {
+    List<ArtistEntity> artists = new ArrayList<>();
+
+    try (PreparedStatement ps = connection.prepareStatement(
+        "SELECT BIN_TO_UUID(id, true) as id, name, biography, photo FROM `artist`"
+    )) {
+      try (ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+          artists.add(mapArtist(rs));
+        }
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+
+    return artists;
   }
 
   @Override

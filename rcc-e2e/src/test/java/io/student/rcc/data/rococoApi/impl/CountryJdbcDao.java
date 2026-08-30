@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -51,6 +53,25 @@ public class CountryJdbcDao implements CountryDao {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public List<CountryEntity> findAll() {
+    List<CountryEntity> countries = new ArrayList<>();
+
+    try (PreparedStatement ps = connection.prepareStatement(
+        "SELECT BIN_TO_UUID(id, true) as id, name FROM `country`"
+    )) {
+      try (ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+          countries.add(mapCountry(rs));
+        }
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+
+    return countries;
   }
 
   @Override

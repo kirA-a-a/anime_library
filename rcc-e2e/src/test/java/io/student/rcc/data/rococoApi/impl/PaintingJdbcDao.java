@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,6 +61,28 @@ public class PaintingJdbcDao implements PaintingDao {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public List<PaintingEntity> findAll() {
+    List<PaintingEntity> paintings = new ArrayList<>();
+
+    try (PreparedStatement ps = connection.prepareStatement(
+        "SELECT BIN_TO_UUID(id, true) as id, title, description, "
+            + "BIN_TO_UUID(artist_id, true) as artist_id, "
+            + "BIN_TO_UUID(museum_id, true) as museum_id, content "
+            + "FROM `painting`"
+    )) {
+      try (ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+          paintings.add(mapPainting(rs));
+        }
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+
+    return paintings;
   }
 
   @Override

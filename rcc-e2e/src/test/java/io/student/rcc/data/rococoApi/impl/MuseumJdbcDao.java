@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,6 +60,26 @@ public class MuseumJdbcDao implements MuseumDao {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public List<MuseumEntity> findAll() {
+    List<MuseumEntity> museums = new ArrayList<>();
+
+    try (PreparedStatement ps = connection.prepareStatement(
+        "SELECT BIN_TO_UUID(id, true) as id, title, description, city, photo, "
+            + "BIN_TO_UUID(country_id, true) as country_id FROM `museum`"
+    )) {
+      try (ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+          museums.add(mapMuseum(rs));
+        }
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+
+    return museums;
   }
 
   @Override
