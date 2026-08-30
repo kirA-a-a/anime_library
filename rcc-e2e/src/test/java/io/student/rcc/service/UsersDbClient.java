@@ -1,56 +1,79 @@
 package io.student.rcc.service;
 
-import static io.student.rcc.utils.RandomUserDataUtils.getRandomFirstName;
-import static io.student.rcc.utils.RandomUserDataUtils.getRandomLastName;
+import static io.student.rcc.data.Databases.xaTransaction;
 
 import io.student.rcc.config.Config;
+import io.student.rcc.data.Databases.XaConsumer;
+import io.student.rcc.data.Databases.XaFunction;
+import io.student.rcc.data.dao.rococoAuth.impl.AuthAuthorityJdbcDao;
+import io.student.rcc.data.dao.rococoAuth.impl.AuthUserJdbcDao;
+import io.student.rcc.data.dao.rococoAuth.impl.UserJdbcDao;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity.Authority;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
 import io.student.rcc.model.UserJson;
-import java.sql.PreparedStatement;
+import java.sql.Connection;
 import java.util.UUID;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class UsersDbClient implements UsersClient {
 
-  private static Config CFG = Config.getInstance();
-  private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  private final static Config CFG = Config.getInstance();
 
   @Override
-  public UserJson createUser(String username, String password) {
-    final JdbcTemplate jdbcTemplate = new JdbcTemplate(
-        new SingleConnectionDataSource(
-            CFG.userJdbcUrl(),
-            CFG.dbUserName(),
-            CFG.dbPassword(),
-            false
-        )
-    );
+  public UUID createUser(String username, String password) {
+    return createUser(username, password, new Authority[0]);
+  }
 
-    jdbcTemplate.update(
-        con -> {
-          PreparedStatement ps = con.prepareStatement(
-              "INSERT INTO user "
-                  + "(username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)"
-                  + " VALUES (?, ?, ?, ?, ?, ?)"
-          );
-          ps.setString(1, username);
-          ps.setString(2, passwordEncoder.encode(password));
-          ps.setBoolean(3, true);
-          ps.setBoolean(4, true);
-          ps.setBoolean(5, true);
-          ps.setBoolean(6, true);
-          return ps;
-        }
-    );
+  public UUID createUser(String username, String password, Authority... authorities) {
+    UUID authUserId = UUID.randomUUID();
 
-    return new UserJson(
-        UUID.randomUUID(),
-        username,
-        getRandomFirstName(),
-        getRandomLastName(),
-        null
+    return xaTransaction(
+        Connection.TRANSACTION_READ_COMMITTED,
+        new XaFunction<>(connection -> {
+          AuthUserEntity authUser = new AuthUserEntity();
+          authUser.setId(authUserId);
+          authUser.setUsername(username);
+          authUser.setPassword(password);
+          authUser.setEnabled(true);
+          authUser.setAccountNonExpired(true);
+          authUser.setAccountNonLocked(true);
+          authUser.setCredentialsNonExpired(true);
+          new AuthUserJdbcDao(connection).create(authUser);
+
+          if (authorities != null && authorities.length > 0) {
+            AuthAuthorityEntity[] entities = new AuthAuthorityEntity[authorities.length];
+            for (int i = 0; i < authorities.length; i++) {
+              AuthAuthorityEntity authorityEntity = new AuthAuthorityEntity();
+              authorityEntity.setUserId(authUserId);
+              authorityEntity.setAuthority(authorities[i]);
+              entities[i] = authorityEntity;
+            }
+            new AuthAuthorityJdbcDao(connection).create(entities);
+          }
+          return authUserId;
+        }, CFG.authJdbcUrl()),
+        new XaFunction<>(connection -> {
+          UserEntity entity = new UserEntity();
+          entity.setId(authUserId);
+          entity.setUsername(username);
+          new UserJdbcDao(connection).create(entity);
+          return authUserId;
+        }, CFG.rccApiJdbcUrl())
+    );
+  }
+
+  @Override
+  public void delete(UserJson user) {
+    xaTransaction(
+        Connection.TRANSACTION_READ_COMMITTED,
+        new XaConsumer(connection -> {
+          new AuthAuthorityJdbcDao(connection).deleteByUserId(user.id());
+          new AuthUserJdbcDao(connection).delete(user.id());
+        }, CFG.authJdbcUrl()),
+        new XaConsumer(connection -> {
+          new UserJdbcDao(connection).delete(UserEntity.fromJson(user));
+        }, CFG.rccApiJdbcUrl())
     );
   }
 }
