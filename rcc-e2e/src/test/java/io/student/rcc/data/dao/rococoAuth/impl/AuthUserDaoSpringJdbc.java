@@ -5,14 +5,10 @@ import io.student.rcc.data.dao.rococoAuth.AuthUserDao;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.dao.rococoAuth.mapper.AuthUserEntityRowMapper;
 import io.student.rcc.data.tpl.DataSources;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,32 +19,24 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
 
   @Override
   public AuthUserEntity create(AuthUserEntity user) {
-
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
-    KeyHolder keyHolder = new GeneratedKeyHolder();
+
+    if (user.getId() == null) {
+      user.setId(UUID.randomUUID());
+    }
 
     jdbcTemplate.update(
-        con -> {
-          PreparedStatement ps = con.prepareStatement(
-              "INSERT INTO `user` "
-                  + "(username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)"
-                  + " VALUES (?, ?, ?, ?, ?, ?)",
-              Statement.RETURN_GENERATED_KEYS
-          );
-
-          ps.setString(1, user.getUsername());
-          ps.setString(2, passwordEncoder.encode(user.getPassword()));
-          ps.setBoolean(3, user.isEnabled());
-          ps.setBoolean(4, user.isAccountNonExpired());
-          ps.setBoolean(5, user.isAccountNonLocked());
-          ps.setBoolean(6, user.isCredentialsNonExpired());
-
-          return ps;
-        }, keyHolder
+        "INSERT INTO `user` "
+            + "(id, username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)"
+            + " VALUES (UUID_TO_BIN(?, true), ?, ?, ?, ?, ?, ?)",
+        user.getId().toString(),
+        user.getUsername(),
+        passwordEncoder.encode(user.getPassword()),
+        user.isEnabled(),
+        user.isAccountNonExpired(),
+        user.isAccountNonLocked(),
+        user.isCredentialsNonExpired()
     );
-
-    final UUID generatedKey = (UUID) keyHolder.getKeys().get("id");
-    user.setId(generatedKey);
 
     return user;
   }

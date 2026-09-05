@@ -16,6 +16,7 @@ def atomikosVersion = '6.0.0'
 def p6spyVersion = '3.9.1'
 def hibernateVersion = '6.6.0.Final'
 def snakeYamlVersion = '1.33'
+def springDataCommonsVersion = '3.5.1'
 
 configurations {
     agent {
@@ -52,6 +53,9 @@ dependencies {
     testImplementation "org.springframework:spring-jdbc:${springJdbcVersion}"
     testImplementation "mysql:mysql-connector-java:${mySqlConnectorVersion}"
     testImplementation "com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11"
+    testImplementation "org.springframework.data:spring-data-commons:${springDataCommonsVersion}"
+
+
 
     // XA / JTA (Atomikos)
     testImplementation "com.atomikos:transactions-jta:${atomikosVersion}:jakarta"

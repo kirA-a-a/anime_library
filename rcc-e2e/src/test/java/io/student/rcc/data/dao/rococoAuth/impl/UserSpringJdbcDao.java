@@ -5,14 +5,10 @@ import io.student.rcc.data.dao.rococoAuth.UserDao;
 import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
 import io.student.rcc.data.dao.rococoAuth.mapper.UserEntityRowMapper;
 import io.student.rcc.data.tpl.DataSources;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 
 public class UserSpringJdbcDao implements UserDao {
 
@@ -21,29 +17,20 @@ public class UserSpringJdbcDao implements UserDao {
   @Override
   public UserEntity create(UserEntity entity) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.rccApiJdbcUrl()));
-    KeyHolder keyHolder = new GeneratedKeyHolder();
+
+    if (entity.getId() == null) {
+      entity.setId(UUID.randomUUID());
+    }
 
     jdbcTemplate.update(
-        con -> {
-
-          PreparedStatement ps = con.prepareStatement(
-              "INSERT INTO `user`(username, firstname, lastname, avatar) "
-                  + "VALUES (?, ?, ?, ?)",
-              Statement.RETURN_GENERATED_KEYS
-          );
-
-          ps.setString(1, entity.getUsername());
-          ps.setString(2, entity.getFirstname());
-          ps.setString(3, entity.getLastname());
-          ps.setBytes(4, entity.getAvatar() != null ? entity.getAvatar().getBytes() : null);
-
-          return ps;
-
-        }, keyHolder
+        "INSERT INTO `user`(id, username, firstname, lastname, avatar) "
+            + "VALUES (UUID_TO_BIN(?, true), ?, ?, ?, ?)",
+        entity.getId().toString(),
+        entity.getUsername(),
+        entity.getFirstname(),
+        entity.getLastname(),
+        entity.getAvatar() != null ? entity.getAvatar().getBytes() : null
     );
-
-    final UUID generatedKey = (UUID) keyHolder.getKeys().get("id");
-    entity.setId(generatedKey);
 
     return entity;
   }

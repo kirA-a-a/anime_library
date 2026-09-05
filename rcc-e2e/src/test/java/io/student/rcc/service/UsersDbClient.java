@@ -1,33 +1,39 @@
 package io.student.rcc.service;
 
 import io.student.rcc.config.Config;
+import io.student.rcc.data.dao.rococoAuth.AuthAuthorityDao;
+import io.student.rcc.data.dao.rococoAuth.AuthUserDao;
+import io.student.rcc.data.dao.rococoAuth.UserDao;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity.Authority;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
-import io.student.rcc.data.dao.rococoAuth.impl.AuthAuthorityJdbcDao;
-import io.student.rcc.data.dao.rococoAuth.impl.AuthUserJdbcDao;
-import io.student.rcc.data.dao.rococoAuth.impl.UserJdbcDao;
-import io.student.rcc.data.tpl.JdbcTransactionTemplate;
-import io.student.rcc.data.tpl.XaTransactionTemplate;
+import io.student.rcc.data.dao.rococoAuth.impl.AuthAuthorityDaoSpringJdbc;
+import io.student.rcc.data.dao.rococoAuth.impl.AuthUserDaoSpringJdbc;
+import io.student.rcc.data.dao.rococoAuth.impl.UserSpringJdbcDao;
+import io.student.rcc.data.tpl.DataSources;
 import io.student.rcc.model.UserJson;
 import java.util.UUID;
+import javax.sql.DataSource;
+import org.springframework.data.transaction.ChainedTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class UsersDbClient implements UsersClient {
 
   private final static Config CFG = Config.getInstance();
+  private final AuthUserDao authUserDao = new AuthUserDaoSpringJdbc();
+  private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoSpringJdbc();
+  private final UserDao userDao = new UserSpringJdbcDao();
 
-  private final AuthUserJdbcDao authUserDao = new AuthUserJdbcDao();
-  private final AuthAuthorityJdbcDao authAuthorityDao = new AuthAuthorityJdbcDao();
-  private final UserJdbcDao userDao = new UserJdbcDao();
+  private final DataSource authDs = DataSources.dataSource(CFG.authJdbcUrl());
+  private final DataSource apiDs = DataSources.dataSource(CFG.rccApiJdbcUrl());
 
-  private final JdbcTransactionTemplate txTemplate = new JdbcTransactionTemplate(
-      CFG.authJdbcUrl()
-  );
-
-  private final XaTransactionTemplate xaTemplate = new XaTransactionTemplate(
-      CFG.authJdbcUrl(),
-      CFG.rccApiJdbcUrl()
+  private final TransactionTemplate txTemplate = new TransactionTemplate(
+      new ChainedTransactionManager(
+          new JdbcTransactionManager(authDs),
+          new JdbcTransactionManager(apiDs)
+      )
   );
 
   @Override
@@ -36,7 +42,8 @@ public class UsersDbClient implements UsersClient {
   }
 
   public UUID createUser(String username, String password, Authority... authorities) {
-    UUID authUserId = txTemplate.execute(() -> {
+    return txTemplate.execute(status -> {
+
       AuthUserEntity authUser = new AuthUserEntity();
       authUser.setUsername(username);
       authUser.setPassword(password);
@@ -58,26 +65,23 @@ public class UsersDbClient implements UsersClient {
         authAuthorityDao.create(entities);
       }
 
+      UserEntity userEntity = new UserEntity();
+      userEntity.setUsername(username);
+      userDao.create(userEntity);
+
       return createdAuthUser.getId();
     });
-
-    UserEntity userEntity = new UserEntity();
-    userEntity.setUsername(username);
-    userDao.create(userEntity);
-
-    return authUserId;
   }
 
   @Override
   public void delete(UserJson user) {
-    xaTemplate.execute(
-        () -> {
+    txTemplate.execute(
+        status -> {
           authAuthorityDao.deleteByUserId(user.id());
           authUserDao.delete(user.id());
-          return null;
-        },
-        () -> {
+
           userDao.findByUsername(user.username()).ifPresent(userDao::delete);
+
           return null;
         }
     );
