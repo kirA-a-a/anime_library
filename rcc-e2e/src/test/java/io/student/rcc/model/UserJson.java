@@ -1,5 +1,6 @@
 package io.student.rcc.model;
 
+import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
 import java.util.UUID;
 
 public record UserJson(
@@ -9,4 +10,14 @@ public record UserJson(
     String lastname,
     String avatar
 ) {
+
+  public static UserJson fromEntity(UserEntity entity) {
+    return new UserJson(
+        entity.getId(),
+        entity.getUsername(),
+        entity.getFirstname(),
+        entity.getLastname(),
+        entity.getAvatar()
+    );
+  }
 }

@@ -1,56 +1,89 @@
 package io.student.rcc.service;
 
-import static io.student.rcc.utils.RandomUserDataUtils.getRandomFirstName;
-import static io.student.rcc.utils.RandomUserDataUtils.getRandomLastName;
-
 import io.student.rcc.config.Config;
+import io.student.rcc.data.dao.rococoAuth.AuthAuthorityDao;
+import io.student.rcc.data.dao.rococoAuth.AuthUserDao;
+import io.student.rcc.data.dao.rococoAuth.UserDao;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity.Authority;
+import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
+import io.student.rcc.data.dao.rococoAuth.impl.AuthAuthorityDaoSpringJdbc;
+import io.student.rcc.data.dao.rococoAuth.impl.AuthUserDaoSpringJdbc;
+import io.student.rcc.data.dao.rococoAuth.impl.UserSpringJdbcDao;
+import io.student.rcc.data.tpl.DataSources;
 import io.student.rcc.model.UserJson;
-import java.sql.PreparedStatement;
 import java.util.UUID;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import javax.sql.DataSource;
+import org.springframework.data.transaction.ChainedTransactionManager;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class UsersDbClient implements UsersClient {
 
-  private static Config CFG = Config.getInstance();
-  private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  private final static Config CFG = Config.getInstance();
+  private final AuthUserDao authUserDao = new AuthUserDaoSpringJdbc();
+  private final AuthAuthorityDao authAuthorityDao = new AuthAuthorityDaoSpringJdbc();
+  private final UserDao userDao = new UserSpringJdbcDao();
+
+  private final DataSource authDs = DataSources.dataSource(CFG.authJdbcUrl());
+  private final DataSource apiDs = DataSources.dataSource(CFG.rccApiJdbcUrl());
+
+  private final TransactionTemplate txTemplate = new TransactionTemplate(
+      new ChainedTransactionManager(
+          new JdbcTransactionManager(authDs),
+          new JdbcTransactionManager(apiDs)
+      )
+  );
 
   @Override
-  public UserJson createUser(String username, String password) {
-    final JdbcTemplate jdbcTemplate = new JdbcTemplate(
-        new SingleConnectionDataSource(
-            CFG.userJdbcUrl(),
-            CFG.dbUserName(),
-            CFG.dbPassword(),
-            false
-        )
-    );
+  public UUID createUser(String username, String password) {
+    return createUser(username, password, new Authority[0]);
+  }
 
-    jdbcTemplate.update(
-        con -> {
-          PreparedStatement ps = con.prepareStatement(
-              "INSERT INTO user "
-                  + "(username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)"
-                  + " VALUES (?, ?, ?, ?, ?, ?)"
-          );
-          ps.setString(1, username);
-          ps.setString(2, passwordEncoder.encode(password));
-          ps.setBoolean(3, true);
-          ps.setBoolean(4, true);
-          ps.setBoolean(5, true);
-          ps.setBoolean(6, true);
-          return ps;
+  public UUID createUser(String username, String password, Authority... authorities) {
+    return txTemplate.execute(status -> {
+
+      AuthUserEntity authUser = new AuthUserEntity();
+      authUser.setUsername(username);
+      authUser.setPassword(password);
+      authUser.setEnabled(true);
+      authUser.setAccountNonExpired(true);
+      authUser.setAccountNonLocked(true);
+      authUser.setCredentialsNonExpired(true);
+
+      AuthUserEntity createdAuthUser = authUserDao.create(authUser);
+
+      if (authorities != null && authorities.length > 0) {
+        AuthAuthorityEntity[] entities = new AuthAuthorityEntity[authorities.length];
+        for (int i = 0; i < authorities.length; i++) {
+          AuthAuthorityEntity authorityEntity = new AuthAuthorityEntity();
+          authorityEntity.setUserId(createdAuthUser.getId());
+          authorityEntity.setAuthority(authorities[i]);
+          entities[i] = authorityEntity;
         }
-    );
+        authAuthorityDao.create(entities);
+      }
 
-    return new UserJson(
-        UUID.randomUUID(),
-        username,
-        getRandomFirstName(),
-        getRandomLastName(),
-        null
+      UserEntity userEntity = new UserEntity();
+      userEntity.setUsername(username);
+      userDao.create(userEntity);
+
+      return createdAuthUser.getId();
+    });
+  }
+
+  @Override
+  public void delete(UserJson user) {
+    txTemplate.execute(
+        status -> {
+          authAuthorityDao.deleteByUserId(user.id());
+          authUserDao.delete(user.id());
+
+          userDao.findByUsername(user.username()).ifPresent(userDao::delete);
+
+          return null;
+        }
     );
   }
 }
