@@ -1,6 +1,8 @@
 package io.student.rcc.data.rococoApi.impl;
 
 import io.student.rcc.data.rococoApi.PaintingDao;
+import io.student.rcc.data.rococoApi.entity.ArtistEntity;
+import io.student.rcc.data.rococoApi.entity.MuseumEntity;
 import io.student.rcc.data.rococoApi.entity.PaintingEntity;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,9 +33,9 @@ public class PaintingJdbcDao implements PaintingDao {
       ps.setString(1, entity.getId().toString());
       ps.setString(2, entity.getTitle());
       ps.setString(3, entity.getDescription());
-      ps.setString(4, entity.getArtistId().toString());
-      ps.setString(5, entity.getMuseumId() != null ? entity.getMuseumId().toString() : null);
-      ps.setBytes(6, entity.getContent() != null ? entity.getContent().getBytes() : null);
+      ps.setString(4, entity.getArtist().getId().toString());
+      ps.setString(5, entity.getMuseum() != null ? entity.getMuseum().getId().toString() : null);
+      ps.setBytes(6, entity.getContent());
 
       ps.executeUpdate();
       return entity;
@@ -115,9 +117,9 @@ public class PaintingJdbcDao implements PaintingDao {
     )) {
       ps.setString(1, entity.getTitle());
       ps.setString(2, entity.getDescription());
-      ps.setString(3, entity.getArtistId().toString());
-      ps.setString(4, entity.getMuseumId() != null ? entity.getMuseumId().toString() : null);
-      ps.setBytes(5, entity.getContent() != null ? entity.getContent().getBytes() : null);
+      ps.setString(3, entity.getArtist().getId().toString());
+      ps.setString(4, entity.getMuseum() != null ? entity.getMuseum().getId().toString() : null);
+      ps.setBytes(5, entity.getContent());
       ps.setString(6, entity.getId().toString());
 
       ps.executeUpdate();
@@ -144,11 +146,18 @@ public class PaintingJdbcDao implements PaintingDao {
     entity.setId(UUID.fromString(rs.getString("id")));
     entity.setTitle(rs.getString("title"));
     entity.setDescription(rs.getString("description"));
-    entity.setArtistId(UUID.fromString(rs.getString("artist_id")));
+    entity.setContent(rs.getBytes("content"));
+
+    ArtistEntity artist = new ArtistEntity();
+    artist.setId(UUID.fromString(rs.getString("artist_id")));
+    entity.setArtist(artist);
+
     String museumId = rs.getString("museum_id");
-    entity.setMuseumId(museumId != null ? UUID.fromString(museumId) : null);
-    byte[] content = rs.getBytes("content");
-    entity.setContent(content != null ? new String(content) : null);
+    if (museumId != null) {
+      MuseumEntity museum = new MuseumEntity();
+      museum.setId(UUID.fromString(museumId));
+      entity.setMuseum(museum);
+    }
     return entity;
   }
 }

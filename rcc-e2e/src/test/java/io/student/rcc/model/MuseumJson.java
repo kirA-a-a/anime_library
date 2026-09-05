@@ -1,6 +1,7 @@
 package io.student.rcc.model;
 
 import io.student.rcc.data.rococoApi.entity.MuseumEntity;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public record MuseumJson(
@@ -18,8 +19,8 @@ public record MuseumJson(
         entity.getTitle(),
         entity.getDescription(),
         entity.getCity(),
-        entity.getPhoto(),
-        entity.getCountryId()
+        entity.getPhoto() != null ? new String(entity.getPhoto(), StandardCharsets.UTF_8) : null,
+        entity.getCountry() != null ? entity.getCountry().getId() : null
     );
   }
 }

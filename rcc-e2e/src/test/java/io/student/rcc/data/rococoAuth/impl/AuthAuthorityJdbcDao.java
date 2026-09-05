@@ -1,17 +1,15 @@
-package io.student.rcc.data.dao.rococoAuth.impl;
+package io.student.rcc.data.rococoAuth.impl;
 
 import static io.student.rcc.data.tpl.Connections.holder;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.dao.rococoAuth.AuthAuthorityDao;
-import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
-import java.sql.Connection;
+import io.student.rcc.data.rococoAuth.AuthAuthorityDao;
+import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 public class AuthAuthorityJdbcDao implements AuthAuthorityDao {

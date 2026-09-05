@@ -35,9 +35,9 @@ public class PaintingDaoSpringJdbc implements PaintingDao {
           );
           ps.setString(1, entity.getTitle());
           ps.setString(2, entity.getDescription());
-          ps.setString(3, entity.getArtistId().toString());
-          ps.setString(4, entity.getMuseumId() != null ? entity.getMuseumId().toString() : null);
-          ps.setBytes(5, entity.getContent() != null ? entity.getContent().getBytes() : null);
+          ps.setString(3, entity.getArtist().getId().toString());
+          ps.setString(4, entity.getMuseum() != null ? entity.getMuseum().getId().toString() : null);
+          ps.setBytes(5, entity.getContent());
           return ps;
         }, keyHolder
     );
@@ -99,9 +99,9 @@ public class PaintingDaoSpringJdbc implements PaintingDao {
         ps -> {
           ps.setString(1, entity.getTitle());
           ps.setString(2, entity.getDescription());
-          ps.setString(3, entity.getArtistId().toString());
-          ps.setString(4, entity.getMuseumId() != null ? entity.getMuseumId().toString() : null);
-          ps.setBytes(5, entity.getContent() != null ? entity.getContent().getBytes() : null);
+          ps.setString(3, entity.getArtist().getId().toString());
+          ps.setString(4, entity.getMuseum() != null ? entity.getMuseum().getId().toString() : null);
+          ps.setBytes(5, entity.getContent());
           ps.setString(6, entity.getId().toString());
         }
     );

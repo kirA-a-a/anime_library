@@ -1,16 +1,16 @@
 package io.student.rcc.service;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.dao.rococoAuth.AuthAuthorityDao;
-import io.student.rcc.data.dao.rococoAuth.AuthUserDao;
-import io.student.rcc.data.dao.rococoAuth.UserDao;
-import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
-import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity.Authority;
-import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
-import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
-import io.student.rcc.data.dao.rococoAuth.impl.AuthAuthorityDaoSpringJdbc;
-import io.student.rcc.data.dao.rococoAuth.impl.AuthUserDaoSpringJdbc;
-import io.student.rcc.data.dao.rococoAuth.impl.UserSpringJdbcDao;
+import io.student.rcc.data.rococoAuth.AuthAuthorityDao;
+import io.student.rcc.data.rococoAuth.AuthUserDao;
+import io.student.rcc.data.rococoAuth.UserDao;
+import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
+import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity.Authority;
+import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.entity.UserEntity;
+import io.student.rcc.data.rococoAuth.impl.AuthAuthorityDaoSpringJdbc;
+import io.student.rcc.data.rococoAuth.impl.AuthUserDaoSpringJdbc;
+import io.student.rcc.data.rococoAuth.impl.UserSpringJdbcDao;
 import io.student.rcc.data.tpl.DataSources;
 import io.student.rcc.model.UserJson;
 import java.util.UUID;

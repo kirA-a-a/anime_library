@@ -1,9 +1,9 @@
-package io.student.rcc.data.dao.rococoAuth.impl;
+package io.student.rcc.data.rococoAuth.impl;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.dao.rococoAuth.UserDao;
-import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
-import io.student.rcc.data.dao.rococoAuth.mapper.UserEntityRowMapper;
+import io.student.rcc.data.rococoAuth.UserDao;
+import io.student.rcc.data.rococoAuth.entity.UserEntity;
+import io.student.rcc.data.rococoAuth.mapper.UserEntityRowMapper;
 import io.student.rcc.data.tpl.DataSources;
 import java.util.List;
 import java.util.Optional;

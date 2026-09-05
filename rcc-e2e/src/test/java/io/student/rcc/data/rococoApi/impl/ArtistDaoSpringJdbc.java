@@ -34,7 +34,7 @@ public class ArtistDaoSpringJdbc implements ArtistDao {
           );
           ps.setString(1, entity.getName());
           ps.setString(2, entity.getBiography());
-          ps.setBytes(3, entity.getPhoto() != null ? entity.getPhoto().getBytes() : null);
+          ps.setBytes(3, entity.getPhoto());
           return ps;
         }, keyHolder
     );
@@ -87,7 +87,7 @@ public class ArtistDaoSpringJdbc implements ArtistDao {
         ps -> {
           ps.setString(1, entity.getName());
           ps.setString(2, entity.getBiography());
-          ps.setBytes(3, entity.getPhoto() != null ? entity.getPhoto().getBytes() : null);
+          ps.setBytes(3, entity.getPhoto());
           ps.setString(4, entity.getId().toString());
         }
     );

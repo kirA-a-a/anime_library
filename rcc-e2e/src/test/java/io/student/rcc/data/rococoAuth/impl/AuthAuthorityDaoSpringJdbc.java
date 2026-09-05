@@ -1,16 +1,14 @@
-package io.student.rcc.data.dao.rococoAuth.impl;
+package io.student.rcc.data.rococoAuth.impl;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.dao.rococoAuth.AuthAuthorityDao;
-import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
-import io.student.rcc.data.dao.rococoAuth.mapper.AuthAuthorityEntityRowMapper;
+import io.student.rcc.data.rococoAuth.AuthAuthorityDao;
+import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
+import io.student.rcc.data.rococoAuth.mapper.AuthAuthorityEntityRowMapper;
 import io.student.rcc.data.tpl.DataSources;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import javax.sql.DataSource;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 

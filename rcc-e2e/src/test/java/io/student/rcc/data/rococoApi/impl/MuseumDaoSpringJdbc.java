@@ -36,8 +36,8 @@ public class MuseumDaoSpringJdbc implements MuseumDao {
           ps.setString(1, entity.getTitle());
           ps.setString(2, entity.getDescription());
           ps.setString(3, entity.getCity());
-          ps.setBytes(4, entity.getPhoto() != null ? entity.getPhoto().getBytes() : null);
-          ps.setString(5, entity.getCountryId().toString());
+          ps.setBytes(4, entity.getPhoto());
+          ps.setString(5, entity.getCountry().getId().toString());
           return ps;
         }, keyHolder
     );
@@ -95,8 +95,8 @@ public class MuseumDaoSpringJdbc implements MuseumDao {
           ps.setString(1, entity.getTitle());
           ps.setString(2, entity.getDescription());
           ps.setString(3, entity.getCity());
-          ps.setBytes(4, entity.getPhoto() != null ? entity.getPhoto().getBytes() : null);
-          ps.setString(5, entity.getCountryId().toString());
+          ps.setBytes(4, entity.getPhoto());
+          ps.setString(5, entity.getCountry().getId().toString());
           ps.setString(6, entity.getId().toString());
         }
     );

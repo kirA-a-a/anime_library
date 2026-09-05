@@ -1,6 +1,7 @@
 package io.student.rcc.model;
 
 import io.student.rcc.data.rococoApi.entity.PaintingEntity;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public record PaintingJson(
@@ -17,9 +18,9 @@ public record PaintingJson(
         entity.getId(),
         entity.getTitle(),
         entity.getDescription(),
-        entity.getContent(),
-        entity.getArtistId(),
-        entity.getMuseumId()
+        entity.getContent() != null ? new String(entity.getContent(), StandardCharsets.UTF_8) : null,
+        entity.getArtist() != null ? entity.getArtist().getId() : null,
+        entity.getMuseum() != null ? entity.getMuseum().getId() : null
     );
   }
 }

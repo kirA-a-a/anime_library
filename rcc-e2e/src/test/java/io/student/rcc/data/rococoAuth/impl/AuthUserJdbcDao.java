@@ -1,10 +1,10 @@
-package io.student.rcc.data.dao.rococoAuth.impl;
+package io.student.rcc.data.rococoAuth.impl;
 
 import static io.student.rcc.data.tpl.Connections.holder;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.dao.rococoAuth.AuthUserDao;
-import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.AuthUserDao;
+import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

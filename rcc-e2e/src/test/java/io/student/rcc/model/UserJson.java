@@ -1,6 +1,6 @@
 package io.student.rcc.model;
 
-import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
+import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import java.util.UUID;
 
 public record UserJson(

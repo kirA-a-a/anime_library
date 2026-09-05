@@ -1,7 +1,6 @@
-package io.student.rcc.data.dao.rococoAuth.mapper;
+package io.student.rcc.data.rococoAuth.mapper;
 
-import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
-import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
+import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;

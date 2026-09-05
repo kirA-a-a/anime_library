@@ -1,6 +1,6 @@
-package io.student.rcc.data.dao.rococoAuth.mapper;
+package io.student.rcc.data.rococoAuth.mapper;
 
-import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -19,7 +19,7 @@ public class AuthUserEntityRowMapper implements RowMapper<AuthUserEntity> {
 
     AuthUserEntity result = new AuthUserEntity();
 
-    result.setId(rs.getObject("id", UUID.class));
+    result.setId(UUID.fromString(rs.getString("id")));
     result.setUsername(rs.getString("username"));
     result.setPassword(rs.getString("password"));
     result.setEnabled(rs.getBoolean("enabled"));

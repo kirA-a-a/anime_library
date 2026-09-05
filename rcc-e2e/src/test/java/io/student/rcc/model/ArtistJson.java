@@ -1,6 +1,7 @@
 package io.student.rcc.model;
 
 import io.student.rcc.data.rococoApi.entity.ArtistEntity;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public record ArtistJson(
@@ -15,7 +16,7 @@ public record ArtistJson(
         entity.getId(),
         entity.getName(),
         entity.getBiography(),
-        entity.getPhoto()
+        entity.getPhoto() != null ? new String(entity.getPhoto(), StandardCharsets.UTF_8) : null
     );
   }
 }

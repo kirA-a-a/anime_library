@@ -1,6 +1,6 @@
-package io.student.rcc.data.dao.rococoAuth;
+package io.student.rcc.data.rococoAuth;
 
-import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
+import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

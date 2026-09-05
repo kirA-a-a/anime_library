@@ -1,4 +1,4 @@
-package io.student.rcc.data.dao.rococoAuth.entity;
+package io.student.rcc.data.rococoAuth.entity;
 
 import io.student.rcc.model.AuthAuthorityJson;
 import java.util.UUID;

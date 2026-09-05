@@ -1,10 +1,10 @@
-package io.student.rcc.data.dao.rococoAuth.impl;
+package io.student.rcc.data.rococoApi.repository.iml;
 
 import static io.student.rcc.data.tpl.Connections.holder;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.dao.rococoAuth.UserDao;
-import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
+import io.student.rcc.data.rococoApi.entity.CountryEntity;
+import io.student.rcc.data.rococoApi.repository.CountryRepository;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,25 +13,20 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserJdbcDao implements UserDao {
+public class CountryRepositoryJdbc implements CountryRepository {
 
-  static final Config CFG = Config.getInstance();
+  private static final Config CFG = Config.getInstance();
 
   @Override
-  public UserEntity create(UserEntity entity) {
+  public CountryEntity create(CountryEntity entity) {
     try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
-        "INSERT INTO `user`(id, username, firstname, lastname, avatar) "
-            + "VALUES (UUID_TO_BIN(?, true), ?, ?, ?, ?)"
+        "INSERT INTO `country`(id, name) VALUES (UUID_TO_BIN(?, true), ?)"
     )) {
       if (entity.getId() == null) {
         entity.setId(UUID.randomUUID());
       }
       ps.setString(1, entity.getId().toString());
-      ps.setString(2, entity.getUsername());
-      ps.setString(3, entity.getFirstname());
-      ps.setString(4, entity.getLastname());
-      ps.setBytes(5, entity.getAvatar() != null ? entity.getAvatar().getBytes() : null);
-
+      ps.setString(2, entity.getName());
       ps.executeUpdate();
       return entity;
     } catch (SQLException e) {
@@ -40,16 +35,14 @@ public class UserJdbcDao implements UserDao {
   }
 
   @Override
-  public Optional<UserEntity> findById(UUID id) {
+  public Optional<CountryEntity> findById(UUID id) {
     try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
-        "SELECT BIN_TO_UUID(id, true) as id, username, firstname, lastname, avatar "
-            + "FROM `user` WHERE id = UUID_TO_BIN(?, true)"
+        "SELECT BIN_TO_UUID(id, true) AS id, name FROM `country` WHERE id = UUID_TO_BIN(?, true)"
     )) {
       ps.setString(1, id.toString());
-
       try (ResultSet rs = ps.executeQuery()) {
         if (rs.next()) {
-          return Optional.of(mapUser(rs));
+          return Optional.of(mapCountry(rs));
         }
         return Optional.empty();
       }
@@ -59,37 +52,31 @@ public class UserJdbcDao implements UserDao {
   }
 
   @Override
-  public List<UserEntity> findAll() {
-
-    List<UserEntity> users = new ArrayList<>();
-
+  public List<CountryEntity> findAll() {
+    List<CountryEntity> countries = new ArrayList<>();
     try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
-        "SELECT BIN_TO_UUID(id, true) AS id, username, firstname, lastname, avatar "
-            + "FROM `user`"
+        "SELECT BIN_TO_UUID(id, true) AS id, name FROM `country`"
     )) {
       try (ResultSet rs = ps.executeQuery()) {
         while (rs.next()) {
-          users.add(mapUser(rs));
+          countries.add(mapCountry(rs));
         }
       }
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
-
-    return users;
+    return countries;
   }
 
   @Override
-  public Optional<UserEntity> findByUsername(String username) {
+  public Optional<CountryEntity> findByName(String name) {
     try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
-        "SELECT BIN_TO_UUID(id, true) as id, username, firstname, lastname, avatar "
-            + "FROM `user` WHERE username = ?"
+        "SELECT BIN_TO_UUID(id, true) AS id, name FROM `country` WHERE name = ?"
     )) {
-      ps.setString(1, username);
-
+      ps.setString(1, name);
       try (ResultSet rs = ps.executeQuery()) {
         if (rs.next()) {
-          return Optional.of(mapUser(rs));
+          return Optional.of(mapCountry(rs));
         }
         return Optional.empty();
       }
@@ -99,9 +86,23 @@ public class UserJdbcDao implements UserDao {
   }
 
   @Override
-  public void delete(UserEntity entity) {
+  public CountryEntity update(CountryEntity entity) {
     try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
-        "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)"
+        "UPDATE `country` SET name = ? WHERE id = UUID_TO_BIN(?, true)"
+    )) {
+      ps.setString(1, entity.getName());
+      ps.setString(2, entity.getId().toString());
+      ps.executeUpdate();
+      return entity;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void delete(CountryEntity entity) {
+    try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
+        "DELETE FROM `country` WHERE id = UUID_TO_BIN(?, true)"
     )) {
       ps.setString(1, entity.getId().toString());
       ps.executeUpdate();
@@ -110,14 +111,10 @@ public class UserJdbcDao implements UserDao {
     }
   }
 
-  private static UserEntity mapUser(ResultSet rs) throws SQLException {
-    UserEntity entity = new UserEntity();
+  private static CountryEntity mapCountry(ResultSet rs) throws SQLException {
+    CountryEntity entity = new CountryEntity();
     entity.setId(UUID.fromString(rs.getString("id")));
-    entity.setUsername(rs.getString("username"));
-    entity.setFirstname(rs.getString("firstname"));
-    entity.setLastname(rs.getString("lastname"));
-    byte[] avatar = rs.getBytes("avatar");
-    entity.setAvatar(avatar != null ? new String(avatar) : null);
+    entity.setName(rs.getString("name"));
     return entity;
   }
 }

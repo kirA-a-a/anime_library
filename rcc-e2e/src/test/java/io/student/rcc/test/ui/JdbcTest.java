@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity.Authority;
+import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity.Authority;
 import io.student.rcc.service.UsersDbClient;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;

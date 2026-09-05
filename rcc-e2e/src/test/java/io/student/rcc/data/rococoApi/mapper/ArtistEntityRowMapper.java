@@ -20,8 +20,7 @@ public class ArtistEntityRowMapper implements RowMapper<ArtistEntity> {
     entity.setId(UUID.fromString(rs.getString("id")));
     entity.setName(rs.getString("name"));
     entity.setBiography(rs.getString("biography"));
-    byte[] photo = rs.getBytes("photo");
-    entity.setPhoto(photo != null ? new String(photo) : null);
+    entity.setPhoto(rs.getBytes("photo"));
     return entity;
   }
 }

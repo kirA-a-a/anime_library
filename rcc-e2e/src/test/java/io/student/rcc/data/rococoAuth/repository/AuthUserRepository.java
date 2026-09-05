@@ -1,11 +1,11 @@
-package io.student.rcc.data.dao.rococoAuth;
+package io.student.rcc.data.rococoAuth.repository;
 
-import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface AuthUserDao {
+public interface AuthUserRepository {
 
   AuthUserEntity create(AuthUserEntity user);
 

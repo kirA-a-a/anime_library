@@ -1,6 +1,7 @@
 package io.student.rcc.data.rococoApi.impl;
 
 import io.student.rcc.data.rococoApi.MuseumDao;
+import io.student.rcc.data.rococoApi.entity.CountryEntity;
 import io.student.rcc.data.rococoApi.entity.MuseumEntity;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,8 +33,8 @@ public class MuseumJdbcDao implements MuseumDao {
       ps.setString(2, entity.getTitle());
       ps.setString(3, entity.getDescription());
       ps.setString(4, entity.getCity());
-      ps.setBytes(5, entity.getPhoto() != null ? entity.getPhoto().getBytes() : null);
-      ps.setString(6, entity.getCountryId().toString());
+      ps.setBytes(5, entity.getPhoto());
+      ps.setString(6, entity.getCountry().getId().toString());
 
       ps.executeUpdate();
       return entity;
@@ -111,8 +112,8 @@ public class MuseumJdbcDao implements MuseumDao {
       ps.setString(1, entity.getTitle());
       ps.setString(2, entity.getDescription());
       ps.setString(3, entity.getCity());
-      ps.setBytes(4, entity.getPhoto() != null ? entity.getPhoto().getBytes() : null);
-      ps.setString(5, entity.getCountryId().toString());
+      ps.setBytes(4, entity.getPhoto());
+      ps.setString(5, entity.getCountry().getId().toString());
       ps.setString(6, entity.getId().toString());
 
       ps.executeUpdate();
@@ -140,9 +141,10 @@ public class MuseumJdbcDao implements MuseumDao {
     entity.setTitle(rs.getString("title"));
     entity.setDescription(rs.getString("description"));
     entity.setCity(rs.getString("city"));
-    byte[] photo = rs.getBytes("photo");
-    entity.setPhoto(photo != null ? new String(photo) : null);
-    entity.setCountryId(UUID.fromString(rs.getString("country_id")));
+    entity.setPhoto(rs.getBytes("photo"));
+    CountryEntity country = new CountryEntity();
+    country.setId(UUID.fromString(rs.getString("country_id")));
+    entity.setCountry(country);
     return entity;
   }
 }

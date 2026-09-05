@@ -31,7 +31,7 @@ public class ArtistJdbcDao implements ArtistDao {
       ps.setString(1, entity.getId().toString());
       ps.setString(2, entity.getName());
       ps.setString(3, entity.getBiography());
-      ps.setBytes(4, entity.getPhoto() != null ? entity.getPhoto().getBytes() : null);
+      ps.setBytes(4, entity.getPhoto());
 
       ps.executeUpdate();
       return entity;
@@ -105,7 +105,7 @@ public class ArtistJdbcDao implements ArtistDao {
     )) {
       ps.setString(1, entity.getName());
       ps.setString(2, entity.getBiography());
-      ps.setBytes(3, entity.getPhoto() != null ? entity.getPhoto().getBytes() : null);
+      ps.setBytes(3, entity.getPhoto());
       ps.setString(4, entity.getId().toString());
 
       ps.executeUpdate();
@@ -132,8 +132,7 @@ public class ArtistJdbcDao implements ArtistDao {
     entity.setId(UUID.fromString(rs.getString("id")));
     entity.setName(rs.getString("name"));
     entity.setBiography(rs.getString("biography"));
-    byte[] photo = rs.getBytes("photo");
-    entity.setPhoto(photo != null ? new String(photo) : null);
+    entity.setPhoto(rs.getBytes("photo"));
     return entity;
   }
 }
