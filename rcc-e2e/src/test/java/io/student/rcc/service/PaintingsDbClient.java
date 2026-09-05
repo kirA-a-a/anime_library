@@ -1,62 +1,54 @@
 package io.student.rcc.service;
 
-import static io.student.rcc.data.Databases.transaction;
-
 import io.student.rcc.config.Config;
-import io.student.rcc.data.rococoApi.impl.PaintingJdbcDao;
 import io.student.rcc.data.rococoApi.entity.PaintingEntity;
+import io.student.rcc.data.rococoApi.impl.PaintingDaoSpringJdbc;
+import io.student.rcc.data.tpl.DataSources;
 import io.student.rcc.model.PaintingJson;
-import java.sql.Connection;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class PaintingsDbClient implements PaintingsClient {
 
   private static final Config CFG = Config.getInstance();
 
+  private final TransactionTemplate txTemplate = new TransactionTemplate(
+      new JdbcTransactionManager(
+          DataSources.dataSource(CFG.rccApiJdbcUrl())
+      )
+  );
+
+  private final PaintingDaoSpringJdbc paintingDao = new PaintingDaoSpringJdbc(
+      DataSources.dataSource(CFG.rccApiJdbcUrl())
+  );
+
   @Override
   public PaintingJson create(PaintingJson painting) {
-    return transaction(
-        connection -> {
-          return PaintingJson.fromEntity(
-              new PaintingJdbcDao(connection).create(PaintingEntity.fromJson(painting))
-          );
-        },
-        CFG.rccApiJdbcUrl(),
-        Connection.TRANSACTION_READ_COMMITTED
+    return txTemplate.execute(status ->
+        PaintingJson.fromEntity(paintingDao.create(PaintingEntity.fromJson(painting)))
     );
   }
 
   @Override
   public Optional<PaintingJson> findById(UUID id) {
-    return transaction(
-        connection -> {
-          return new PaintingJdbcDao(connection).findById(id).map(PaintingJson::fromEntity);
-        },
-        CFG.rccApiJdbcUrl(),
-        Connection.TRANSACTION_READ_COMMITTED
+    return txTemplate.execute(status ->
+        paintingDao.findById(id).map(PaintingJson::fromEntity)
     );
   }
 
   @Override
   public Optional<PaintingJson> findByTitle(String title) {
-    return transaction(
-        connection -> {
-          return new PaintingJdbcDao(connection).findByTitle(title).map(PaintingJson::fromEntity);
-        },
-        CFG.rccApiJdbcUrl(),
-        Connection.TRANSACTION_READ_COMMITTED
+    return txTemplate.execute(status ->
+        paintingDao.findByTitle(title).map(PaintingJson::fromEntity)
     );
   }
 
   @Override
   public void delete(PaintingJson painting) {
-    transaction(
-        connection -> {
-          new PaintingJdbcDao(connection).delete(PaintingEntity.fromJson(painting));
-        },
-        CFG.rccApiJdbcUrl(),
-        Connection.TRANSACTION_READ_COMMITTED
+    txTemplate.executeWithoutResult(status ->
+        paintingDao.delete(PaintingEntity.fromJson(painting))
     );
   }
 }

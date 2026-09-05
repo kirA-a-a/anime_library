@@ -1,14 +1,15 @@
 package io.student.rcc.data.dao.rococoAuth.impl;
 
+import io.student.rcc.config.Config;
 import io.student.rcc.data.dao.rococoAuth.AuthUserDao;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.dao.rococoAuth.mapper.AuthUserEntityRowMapper;
+import io.student.rcc.data.tpl.DataSources;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -17,17 +18,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class AuthUserDaoSpringJdbc implements AuthUserDao {
 
-  private final DataSource dataSource;
+  private static final Config CFG = Config.getInstance();
   private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
-  public AuthUserDaoSpringJdbc(DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
 
   @Override
   public AuthUserEntity create(AuthUserEntity user) {
 
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
     jdbcTemplate.update(
@@ -58,7 +55,7 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
 
   @Override
   public Optional<AuthUserEntity> findById(UUID id) {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
 
     return Optional.ofNullable(
         jdbcTemplate
@@ -72,7 +69,7 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
 
   @Override
   public List<AuthUserEntity> findAll() {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
 
     return jdbcTemplate.query(
         "SELECT BIN_TO_UUID(id, true) AS id, username, password, enabled, "
@@ -84,7 +81,7 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
 
   @Override
   public void delete(UUID id) {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
 
     jdbcTemplate.update(
         "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)",

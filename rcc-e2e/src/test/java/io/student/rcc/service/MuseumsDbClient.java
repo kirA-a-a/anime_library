@@ -1,62 +1,54 @@
 package io.student.rcc.service;
 
-import static io.student.rcc.data.Databases.transaction;
-
 import io.student.rcc.config.Config;
-import io.student.rcc.data.rococoApi.impl.MuseumJdbcDao;
 import io.student.rcc.data.rococoApi.entity.MuseumEntity;
+import io.student.rcc.data.rococoApi.impl.MuseumDaoSpringJdbc;
+import io.student.rcc.data.tpl.DataSources;
 import io.student.rcc.model.MuseumJson;
-import java.sql.Connection;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.jdbc.support.JdbcTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 public class MuseumsDbClient implements MuseumsClient {
 
   private static final Config CFG = Config.getInstance();
 
+  private final TransactionTemplate txTemplate = new TransactionTemplate(
+      new JdbcTransactionManager(
+          DataSources.dataSource(CFG.rccApiJdbcUrl())
+      )
+  );
+
+  private final MuseumDaoSpringJdbc museumDao = new MuseumDaoSpringJdbc(
+      DataSources.dataSource(CFG.rccApiJdbcUrl())
+  );
+
   @Override
   public MuseumJson create(MuseumJson museum) {
-    return transaction(
-        connection -> {
-          return MuseumJson.fromEntity(
-              new MuseumJdbcDao(connection).create(MuseumEntity.fromJson(museum))
-          );
-        },
-        CFG.rccApiJdbcUrl(),
-        Connection.TRANSACTION_READ_COMMITTED
+    return txTemplate.execute(status ->
+        MuseumJson.fromEntity(museumDao.create(MuseumEntity.fromJson(museum)))
     );
   }
 
   @Override
   public Optional<MuseumJson> findById(UUID id) {
-    return transaction(
-        connection -> {
-          return new MuseumJdbcDao(connection).findById(id).map(MuseumJson::fromEntity);
-        },
-        CFG.rccApiJdbcUrl(),
-        Connection.TRANSACTION_READ_COMMITTED
+    return txTemplate.execute(status ->
+        museumDao.findById(id).map(MuseumJson::fromEntity)
     );
   }
 
   @Override
   public Optional<MuseumJson> findByTitle(String title) {
-    return transaction(
-        connection -> {
-          return new MuseumJdbcDao(connection).findByTitle(title).map(MuseumJson::fromEntity);
-        },
-        CFG.rccApiJdbcUrl(),
-        Connection.TRANSACTION_READ_COMMITTED
+    return txTemplate.execute(status ->
+        museumDao.findByTitle(title).map(MuseumJson::fromEntity)
     );
   }
 
   @Override
   public void delete(MuseumJson museum) {
-    transaction(
-        connection -> {
-          new MuseumJdbcDao(connection).delete(MuseumEntity.fromJson(museum));
-        },
-        CFG.rccApiJdbcUrl(),
-        Connection.TRANSACTION_READ_COMMITTED
+    txTemplate.executeWithoutResult(status ->
+        museumDao.delete(MuseumEntity.fromJson(museum))
     );
   }
 }

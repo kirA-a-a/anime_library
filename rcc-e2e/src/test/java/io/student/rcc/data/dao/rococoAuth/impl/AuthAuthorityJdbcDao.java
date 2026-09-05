@@ -1,5 +1,8 @@
 package io.student.rcc.data.dao.rococoAuth.impl;
 
+import static io.student.rcc.data.tpl.Connections.holder;
+
+import io.student.rcc.config.Config;
 import io.student.rcc.data.dao.rococoAuth.AuthAuthorityDao;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
 import java.sql.Connection;
@@ -13,15 +16,11 @@ import java.util.UUID;
 
 public class AuthAuthorityJdbcDao implements AuthAuthorityDao {
 
-  private final Connection connection;
-
-  public AuthAuthorityJdbcDao(Connection connection) {
-    this.connection = connection;
-  }
+  static final Config CFG = Config.getInstance();
 
   @Override
   public void create(AuthAuthorityEntity... entities) {
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps =  holder(CFG.authJdbcUrl()).connection().prepareStatement(
         "INSERT INTO `authority`(id, user_id, authority) "
             + "VALUES (UUID_TO_BIN(?, true), UUID_TO_BIN(?, true), ?)"
     )) {
@@ -45,7 +44,7 @@ public class AuthAuthorityJdbcDao implements AuthAuthorityDao {
 
     List<AuthAuthorityEntity> authorities = new ArrayList<>();
 
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
         "SELECT BIN_TO_UUID(id, true) AS id, "
             + "BIN_TO_UUID(user_id, true) AS user_id, authority "
             + "FROM `authority`"
@@ -76,7 +75,7 @@ public class AuthAuthorityJdbcDao implements AuthAuthorityDao {
 
   @Override
   public void deleteByUserId(UUID userId) {
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
         "DELETE FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)"
     )) {
       ps.setString(1, userId.toString());

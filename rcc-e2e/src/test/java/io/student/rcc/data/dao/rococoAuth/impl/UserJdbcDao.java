@@ -1,8 +1,10 @@
 package io.student.rcc.data.dao.rococoAuth.impl;
 
+import static io.student.rcc.data.tpl.Connections.holder;
+
+import io.student.rcc.config.Config;
 import io.student.rcc.data.dao.rococoAuth.UserDao;
 import io.student.rcc.data.dao.rococoAuth.entity.UserEntity;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,15 +15,11 @@ import java.util.UUID;
 
 public class UserJdbcDao implements UserDao {
 
-  private final Connection connection;
-
-  public UserJdbcDao(Connection connection) {
-    this.connection = connection;
-  }
+  static final Config CFG = Config.getInstance();
 
   @Override
   public UserEntity create(UserEntity entity) {
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
         "INSERT INTO `user`(id, username, firstname, lastname, avatar) "
             + "VALUES (UUID_TO_BIN(?, true), ?, ?, ?, ?)"
     )) {
@@ -43,7 +41,7 @@ public class UserJdbcDao implements UserDao {
 
   @Override
   public Optional<UserEntity> findById(UUID id) {
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
         "SELECT BIN_TO_UUID(id, true) as id, username, firstname, lastname, avatar "
             + "FROM `user` WHERE id = UUID_TO_BIN(?, true)"
     )) {
@@ -65,7 +63,7 @@ public class UserJdbcDao implements UserDao {
 
     List<UserEntity> users = new ArrayList<>();
 
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
         "SELECT BIN_TO_UUID(id, true) AS id, username, firstname, lastname, avatar "
             + "FROM `user`"
     )) {
@@ -83,7 +81,7 @@ public class UserJdbcDao implements UserDao {
 
   @Override
   public Optional<UserEntity> findByUsername(String username) {
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
         "SELECT BIN_TO_UUID(id, true) as id, username, firstname, lastname, avatar "
             + "FROM `user` WHERE username = ?"
     )) {
@@ -102,7 +100,7 @@ public class UserJdbcDao implements UserDao {
 
   @Override
   public void delete(UserEntity entity) {
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
         "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)"
     )) {
       ps.setString(1, entity.getId().toString());

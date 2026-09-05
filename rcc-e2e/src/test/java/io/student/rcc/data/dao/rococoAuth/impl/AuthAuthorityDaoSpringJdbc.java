@@ -1,8 +1,10 @@
 package io.student.rcc.data.dao.rococoAuth.impl;
 
+import io.student.rcc.config.Config;
 import io.student.rcc.data.dao.rococoAuth.AuthAuthorityDao;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.dao.rococoAuth.mapper.AuthAuthorityEntityRowMapper;
+import io.student.rcc.data.tpl.DataSources;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,15 +16,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
 
-  private final DataSource dataSource;
-
-  public AuthAuthorityDaoSpringJdbc(DataSource dataSource) {
-    this.dataSource = dataSource;
-  }
+  private static final Config CFG = Config.getInstance();
 
   @Override
   public void create(AuthAuthorityEntity... entities) {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
     jdbcTemplate.batchUpdate(
         "INSERT INTO `authority`(user_id, authority) VALUES (UUID_TO_BIN(?, true), ?)",
         new BatchPreparedStatementSetter() {
@@ -43,7 +41,7 @@ public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
   @Override
   public List<AuthAuthorityEntity> findAll() {
 
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
 
     return jdbcTemplate.query(
         "SELECT BIN_TO_UUID(id, true) AS id, "
@@ -55,7 +53,7 @@ public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
 
   @Override
   public void deleteByUserId(UUID userId) {
-    JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
     jdbcTemplate.update(
         "DELETE FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)",
         userId.toString()

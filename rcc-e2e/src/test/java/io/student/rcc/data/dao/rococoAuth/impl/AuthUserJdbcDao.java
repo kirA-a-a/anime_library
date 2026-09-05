@@ -1,9 +1,10 @@
 package io.student.rcc.data.dao.rococoAuth.impl;
 
+import static io.student.rcc.data.tpl.Connections.holder;
+
+import io.student.rcc.config.Config;
 import io.student.rcc.data.dao.rococoAuth.AuthUserDao;
-import io.student.rcc.data.dao.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.dao.rococoAuth.entity.AuthUserEntity;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,18 +17,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class AuthUserJdbcDao implements AuthUserDao {
 
-  private final Connection connection;
+  static final Config CFG = Config.getInstance();
   private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
-  public AuthUserJdbcDao(Connection connection) {
-    this.connection = connection;
-  }
 
   @Override
   public AuthUserEntity create(AuthUserEntity user) {
-    try (PreparedStatement ps = connection.prepareStatement("INSERT INTO `user` "
-        + "(id, username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)"
-        + " VALUES (UUID_TO_BIN(?, true), ?, ?, ?, ?, ?, ?)")) {
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+        "INSERT INTO `user` "
+            + "(id, username, password, enabled, account_non_expired, account_non_locked, credentials_non_expired)"
+            + " VALUES (UUID_TO_BIN(?, true), ?, ?, ?, ?, ?, ?)"
+    )) {
       if (user.getId() == null) {
         user.setId(UUID.randomUUID());
       }
@@ -47,10 +46,11 @@ public class AuthUserJdbcDao implements AuthUserDao {
 
   @Override
   public Optional<AuthUserEntity> findById(UUID id) {
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
         "SELECT BIN_TO_UUID(id, true) as id, username, password, enabled, "
             + "account_non_expired, account_non_locked, credentials_non_expired "
-            + "FROM `user` WHERE id = UUID_TO_BIN(?, true)")) {
+            + "FROM `user` WHERE id = UUID_TO_BIN(?, true)"
+    )) {
       ps.setString(1, id.toString());
 
       try (ResultSet rs = ps.executeQuery()) {
@@ -69,10 +69,11 @@ public class AuthUserJdbcDao implements AuthUserDao {
 
     List<AuthUserEntity> userEntities = new ArrayList<>();
 
-    try (PreparedStatement ps = connection.prepareStatement(
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
         "SELECT BIN_TO_UUID(id, true) AS id, username, password, enabled, "
             + "account_non_expired, account_non_locked, credentials_non_expired "
-            + "FROM `user`")) {
+            + "FROM `user`"
+    )) {
 
       try (ResultSet rs = ps.executeQuery()) {
         while (rs.next()) {
@@ -89,8 +90,9 @@ public class AuthUserJdbcDao implements AuthUserDao {
 
   @Override
   public void delete(UUID id) {
-    try (PreparedStatement ps = connection.prepareStatement(
-        "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)")) {
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+        "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)"
+    )) {
       ps.setString(1, id.toString());
       ps.executeUpdate();
     } catch (SQLException e) {
