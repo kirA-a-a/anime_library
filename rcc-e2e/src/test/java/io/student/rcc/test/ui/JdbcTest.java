@@ -7,9 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.student.rcc.config.Config;
+import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity.Authority;
+import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.impl.AuthUserDaoSpringJdbc;
 import io.student.rcc.service.UsersDbClient;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -24,6 +31,7 @@ public class JdbcTest {
   private static final Config CFG = Config.getInstance();
   private static final String PASSWORD = "12345";
   private final UsersDbClient usersDbClient = new UsersDbClient();
+  private final AuthUserDaoSpringJdbc authUserDao = new AuthUserDaoSpringJdbc();
   private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
   private final JdbcTemplate jdbcTemplateAuth = new JdbcTemplate(
       new SingleConnectionDataSource(
@@ -72,6 +80,61 @@ public class JdbcTest {
     assertEquals(username, user.username());
     assertTrue(passwordEncoder.matches(PASSWORD, user.password()));
     assertEquals(authority.dbValue(), findAuthority(id));
+  }
+
+  @Test
+  void shouldCreateUserWithAllAuthorities() {
+    String username = randomUserName();
+
+    UUID id = usersDbClient.createUser(username, PASSWORD, Authority.READ, Authority.WRITE);
+
+    AuthUserRow user = findUser(id);
+    assertNotNull(id);
+    assertEquals(username, user.username());
+    List<AuthorityRow> authoritiesRows = checkAuthorityForUser(id);
+
+    assertEquals(2, authoritiesRows.size());
+
+    Set<Authority> actual = authoritiesRows.stream()
+        .map(AuthorityRow::authority)
+        .collect(Collectors.toSet());
+
+    assertEquals(Set.of(Authority.READ, Authority.WRITE), actual);
+  }
+
+  @Test
+  void findAllShouldReturnSingleUserObjectForJoinedAuthorities() {
+    String username = randomUserName();
+    UUID id = usersDbClient.createUser(username, PASSWORD, Authority.READ, Authority.WRITE);
+
+    List<AuthUserEntity> matched = authUserDao.findAll().stream()
+        .filter(user -> id.equals(user.getId()))
+        .toList();
+
+    assertEquals(1, matched.size());
+
+    AuthUserEntity found = matched.getFirst();
+    Set<Authority> actualAuthorities = found.getAuthorities().stream()
+        .map(AuthAuthorityEntity::getAuthority)
+        .collect(Collectors.toSet());
+
+    assertEquals(2, found.getAuthorities().size());
+    assertEquals(Set.of(Authority.READ, Authority.WRITE), actualAuthorities);
+  }
+
+  private List<AuthorityRow> checkAuthorityForUser(UUID userId) {
+
+    return jdbcTemplateAuth.query(
+        "SELECT BIN_TO_UUID(id, true) AS id, BIN_TO_UUID(user_id, true) AS user_id, authority "
+            + "FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)",
+        (rs, rowNum) -> new AuthorityRow(
+            rs.getObject("id", UUID.class),
+            rs.getObject("user_id", UUID.class),
+            AuthAuthorityEntity.Authority.valueOf(
+                rs.getString("authority").toUpperCase(Locale.ROOT)
+            )),
+        userId.toString());
+
   }
 
   @Test
@@ -168,6 +231,14 @@ public class JdbcTest {
       boolean accountNonExpired,
       boolean accountNonLocked,
       boolean credentialsNonExpired
+  ) {
+
+  }
+
+  private record AuthorityRow(
+      UUID id,
+      UUID userId,
+      Authority authority
   ) {
 
   }

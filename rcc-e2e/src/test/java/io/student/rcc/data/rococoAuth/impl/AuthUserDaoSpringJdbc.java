@@ -4,6 +4,7 @@ import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.AuthUserDao;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.rococoAuth.mapper.AuthUserEntityRowMapper;
+import io.student.rcc.data.rococoAuth.mapper.AuthUserWithAuthoritiesExtractor;
 import io.student.rcc.data.tpl.DataSources;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,15 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
 
   private static final Config CFG = Config.getInstance();
   private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
+  private static final String USER_WITH_AUTHORITIES_SELECT =
+      "SELECT BIN_TO_UUID(u.id, true) AS id, u.username, u.password, u.enabled, "
+          + "u.account_non_expired, u.account_non_locked, u.credentials_non_expired, "
+          + "BIN_TO_UUID(a.id, true) AS authority_id, "
+          + "BIN_TO_UUID(a.user_id, true) AS user_id, "
+          + "a.authority AS authority "
+          + "FROM `user` u "
+          + "LEFT JOIN `authority` a ON u.id = a.user_id";
 
   @Override
   public AuthUserEntity create(AuthUserEntity user) {
@@ -60,10 +70,8 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
 
     return jdbcTemplate.query(
-        "SELECT BIN_TO_UUID(id, true) AS id, username, password, enabled, "
-            + "account_non_expired, account_non_locked, credentials_non_expired "
-            + "FROM `user`",
-        AuthUserEntityRowMapper.instance
+        USER_WITH_AUTHORITIES_SELECT,
+        AuthUserWithAuthoritiesExtractor.instance
     );
   }
 
