@@ -2,7 +2,7 @@ package io.student.rcc.service;
 
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
-import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity.Authority;
+import io.student.rcc.data.rococoAuth.entity.Authority;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import io.student.rcc.data.rococoAuth.repository.AuthUserRepository;
@@ -11,8 +11,6 @@ import io.student.rcc.data.rococoAuth.repository.iml.AuthUserRepositoryJdbc;
 import io.student.rcc.data.rococoAuth.repository.iml.UserRepositoryJdbc;
 import io.student.rcc.data.tpl.DataSources;
 import io.student.rcc.model.UserJson;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import javax.sql.DataSource;
 import org.springframework.data.transaction.ChainedTransactionManager;
@@ -52,13 +50,11 @@ public class UsersDbClient implements UsersClient {
       authUser.setCredentialsNonExpired(true);
 
       if (authorities != null && authorities.length > 0) {
-        List<AuthAuthorityEntity> entities = new ArrayList<>();
         for (Authority authority : authorities) {
           AuthAuthorityEntity authorityEntity = new AuthAuthorityEntity();
           authorityEntity.setAuthority(authority);
-          entities.add(authorityEntity);
+          authUser.addAuthorities(authorityEntity);
         }
-        authUser.setAuthorities(entities);
       }
 
       AuthUserEntity createdAuthUser = authUserRepository.create(authUser);

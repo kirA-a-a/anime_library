@@ -8,12 +8,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
-import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity.Authority;
+import io.student.rcc.data.rococoAuth.entity.Authority;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.rococoAuth.impl.AuthUserDaoSpringJdbc;
 import io.student.rcc.service.UsersDbClient;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -79,14 +78,14 @@ public class JdbcTest {
     assertNotNull(id);
     assertEquals(username, user.username());
     assertTrue(passwordEncoder.matches(PASSWORD, user.password()));
-    assertEquals(authority.dbValue(), findAuthority(id));
+    assertEquals(authority.name(), findAuthority(id));
   }
 
   @Test
   void shouldCreateUserWithAllAuthorities() {
     String username = randomUserName();
 
-    UUID id = usersDbClient.createUser(username, PASSWORD, Authority.READ, Authority.WRITE);
+    UUID id = usersDbClient.createUser(username, PASSWORD, Authority.read, Authority.write);
 
     AuthUserRow user = findUser(id);
     assertNotNull(id);
@@ -99,13 +98,13 @@ public class JdbcTest {
         .map(AuthorityRow::authority)
         .collect(Collectors.toSet());
 
-    assertEquals(Set.of(Authority.READ, Authority.WRITE), actual);
+    assertEquals(Set.of(Authority.read, Authority.write), actual);
   }
 
   @Test
   void findAllShouldReturnSingleUserObjectForJoinedAuthorities() {
     String username = randomUserName();
-    UUID id = usersDbClient.createUser(username, PASSWORD, Authority.READ, Authority.WRITE);
+    UUID id = usersDbClient.createUser(username, PASSWORD, Authority.read, Authority.write);
 
     List<AuthUserEntity> matched = authUserDao.findAll().stream()
         .filter(user -> id.equals(user.getId()))
@@ -119,7 +118,7 @@ public class JdbcTest {
         .collect(Collectors.toSet());
 
     assertEquals(2, found.getAuthorities().size());
-    assertEquals(Set.of(Authority.READ, Authority.WRITE), actualAuthorities);
+    assertEquals(Set.of(Authority.read, Authority.write), actualAuthorities);
   }
 
   private List<AuthorityRow> checkAuthorityForUser(UUID userId) {
@@ -130,9 +129,8 @@ public class JdbcTest {
         (rs, rowNum) -> new AuthorityRow(
             rs.getObject("id", UUID.class),
             rs.getObject("user_id", UUID.class),
-            AuthAuthorityEntity.Authority.valueOf(
-                rs.getString("authority").toUpperCase(Locale.ROOT)
-            )),
+            Authority.valueOf(rs.getString("authority"))
+        ),
         userId.toString());
 
   }
@@ -149,7 +147,7 @@ public class JdbcTest {
 
     try {
       assertThrows(DuplicateKeyException.class, () ->
-          usersDbClient.createUser(username, PASSWORD, Authority.READ)
+          usersDbClient.createUser(username, PASSWORD, Authority.read)
       );
 
       assertEquals(0, countAuthUsers(username));

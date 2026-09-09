@@ -5,6 +5,7 @@ import static io.student.rcc.data.tpl.Connections.holder;
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.entity.Authority;
 import io.student.rcc.data.rococoAuth.mapper.AuthUserEntityRowMapper;
 import io.student.rcc.data.rococoAuth.repository.AuthUserRepository;
 import java.sql.PreparedStatement;
@@ -13,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,14 +63,14 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
           if (authority.getId() == null) {
             authority.setId(UUID.randomUUID());
           }
-          authority.setUserId(user.getId());
+          authority.setUser(user);
           try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
               "INSERT INTO `authority`(id, user_id, authority) "
                   + "VALUES (UUID_TO_BIN(?, true), UUID_TO_BIN(?, true), ?)"
           )) {
             ps.setString(1, authority.getId().toString());
-            ps.setString(2, authority.getUserId().toString());
-            ps.setString(3, authority.getAuthority().dbValue());
+            ps.setString(2, authority.getUser().getId().toString());
+            ps.setString(3, authority.getAuthority().name());
             ps.executeUpdate();
           }
         }
@@ -156,12 +156,8 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     }
     AuthAuthorityEntity authority = new AuthAuthorityEntity();
     authority.setId(UUID.fromString(authorityId));
-    authority.setUserId(UUID.fromString(rs.getString("user_id")));
-    authority.setAuthority(
-        AuthAuthorityEntity.Authority.valueOf(
-            rs.getString("authority").toUpperCase(Locale.ROOT)
-        )
-    );
+    authority.setUser(user);
+    authority.setAuthority(Authority.valueOf(rs.getString("authority")));
     user.getAuthorities().add(authority);
   }
 }

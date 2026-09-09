@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+             version="2.1">
+
+  <persistence-unit
+      name="jdbc:mysql://localhost:3306/rococo-auth?serverTimezone=UTC&amp;createDatabaseIfNotExist=true"
+      transaction-type="JTA">
+    <jta-data-source>java:comp/env/jdbc/rococo-auth</jta-data-source>
+
+    <class>io.student.rcc.data.rococoAuth.entity.AuthUserEntity</class>
+    <class>io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity</class>
+
+    <properties>
+      <property name="hibernate.transaction.jta.platform"
+                value="com.atomikos.icatch.jta.hibernate4.AtomikosPlatform"/>
+      <property name="hibernate.connection.handling_mode"
+                value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_STATEMENT"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+    </properties>
+  </persistence-unit>
+
+  <persistence-unit
+      name="jdbc:mysql://localhost:3306/rococo-api?serverTimezone=UTC&amp;createDatabaseIfNotExist=true"
+      transaction-type="JTA">
+    <jta-data-source>java:comp/env/jdbc/rococo-api</jta-data-source>
+
+    <class>io.student.rcc.data.rococoAuth.entity.UserEntity</class>
+    <class>io.student.rcc.data.rococoApi.entity.CountryEntity</class>
+    <class>io.student.rcc.data.rococoApi.entity.MuseumEntity</class>
+    <class>io.student.rcc.data.rococoApi.entity.ArtistEntity</class>
+    <class>io.student.rcc.data.rococoApi.entity.PaintingEntity</class>
+
+    <properties>
+      <property name="hibernate.transaction.jta.platform"
+                value="com.atomikos.icatch.jta.hibernate4.AtomikosPlatform"/>
+      <property name="hibernate.connection.handling_mode"
+                value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_STATEMENT"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+    </properties>
+  </persistence-unit>
+
+</persistence>

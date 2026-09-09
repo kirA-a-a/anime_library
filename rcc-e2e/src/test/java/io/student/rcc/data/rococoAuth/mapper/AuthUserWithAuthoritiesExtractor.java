@@ -2,12 +2,12 @@ package io.student.rcc.data.rococoAuth.mapper;
 
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.entity.Authority;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.springframework.dao.DataAccessException;
@@ -36,12 +36,8 @@ public class AuthUserWithAuthoritiesExtractor implements ResultSetExtractor<List
       if (authorityId != null) {
         AuthAuthorityEntity authority = new AuthAuthorityEntity();
         authority.setId(UUID.fromString(authorityId));
-        authority.setUserId(UUID.fromString(rs.getString("user_id")));
-        authority.setAuthority(
-            AuthAuthorityEntity.Authority.valueOf(
-                rs.getString("authority").toUpperCase()
-            )
-        );
+        authority.setUser(user);
+        authority.setAuthority(Authority.valueOf(rs.getString("authority")));
         user.getAuthorities().add(authority);
       }
     }

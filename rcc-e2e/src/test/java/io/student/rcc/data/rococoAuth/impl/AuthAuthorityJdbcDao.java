@@ -5,6 +5,8 @@ import static io.student.rcc.data.tpl.Connections.holder;
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.AuthAuthorityDao;
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
+import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.entity.Authority;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +20,7 @@ public class AuthAuthorityJdbcDao implements AuthAuthorityDao {
 
   @Override
   public void create(AuthAuthorityEntity... entities) {
-    try (PreparedStatement ps =  holder(CFG.authJdbcUrl()).connection().prepareStatement(
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
         "INSERT INTO `authority`(id, user_id, authority) "
             + "VALUES (UUID_TO_BIN(?, true), UUID_TO_BIN(?, true), ?)"
     )) {
@@ -27,8 +29,8 @@ public class AuthAuthorityJdbcDao implements AuthAuthorityDao {
           entity.setId(UUID.randomUUID());
         }
         ps.setString(1, entity.getId().toString());
-        ps.setString(2, entity.getUserId().toString());
-        ps.setString(3, entity.getAuthority().dbValue());
+        ps.setString(2, entity.getUser().getId().toString());
+        ps.setString(3, entity.getAuthority().name());
         ps.addBatch();
       }
       ps.executeBatch();
@@ -51,14 +53,12 @@ public class AuthAuthorityJdbcDao implements AuthAuthorityDao {
       try (ResultSet rs = ps.executeQuery()) {
         while (rs.next()) {
           AuthAuthorityEntity entity = new AuthAuthorityEntity();
-
           entity.setId(UUID.fromString(rs.getString("id")));
-          entity.setUserId(UUID.fromString(rs.getString("user_id")));
-          entity.setAuthority(
-              AuthAuthorityEntity.Authority.valueOf(
-                  rs.getString("authority").toUpperCase()
-              )
-          );
+
+          AuthUserEntity user = new AuthUserEntity();
+          user.setId(UUID.fromString(rs.getString("user_id")));
+          entity.setUser(user);
+          entity.setAuthority(Authority.valueOf(rs.getString("authority")));
 
           authorities.add(entity);
         }
