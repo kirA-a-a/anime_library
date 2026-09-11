@@ -130,18 +130,62 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
   }
 
   @Override
-  public void delete(UUID id) {
+  public Optional<AuthUserEntity> findByUsername(String username) {
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+        USER_WITH_AUTHORITIES_SELECT + "WHERE u.username = ?"
+    )) {
+      ps.setString(1, username);
+
+      try (ResultSet rs = ps.executeQuery()) {
+        AuthUserEntity user = null;
+        while (rs.next()) {
+          if (user == null) {
+            user = AuthUserEntityRowMapper.instance.mapRow(rs, 1);
+            user.setAuthorities(new ArrayList<>());
+          }
+          addAuthorityIfPresent(user, rs);
+        }
+        return Optional.ofNullable(user);
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public AuthUserEntity update(AuthUserEntity user) {
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+        "UPDATE `user` SET username = ?, password = ?, enabled = ?, "
+            + "account_non_expired = ?, account_non_locked = ?, credentials_non_expired = ? "
+            + "WHERE id = UUID_TO_BIN(?, true)"
+    )) {
+      ps.setString(1, user.getUsername());
+      ps.setString(2, passwordEncoder.encode(user.getPassword()));
+      ps.setBoolean(3, user.isEnabled());
+      ps.setBoolean(4, user.isAccountNonExpired());
+      ps.setBoolean(5, user.isAccountNonLocked());
+      ps.setBoolean(6, user.isCredentialsNonExpired());
+      ps.setString(7, user.getId().toString());
+      ps.executeUpdate();
+      return user;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void delete(AuthUserEntity user) {
     try {
       try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
           "DELETE FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)"
       )) {
-        ps.setString(1, id.toString());
+        ps.setString(1, user.getId().toString());
         ps.executeUpdate();
       }
       try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
           "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)"
       )) {
-        ps.setString(1, id.toString());
+        ps.setString(1, user.getId().toString());
         ps.executeUpdate();
       }
     } catch (SQLException e) {

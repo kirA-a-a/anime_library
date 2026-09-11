@@ -76,6 +76,23 @@ public class UserSpringJdbcDao implements UserDao {
   }
 
   @Override
+  public UserEntity update(UserEntity entity) {
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.rccApiJdbcUrl()));
+
+    jdbcTemplate.update(
+        "UPDATE `user` SET username = ?, firstname = ?, lastname = ?, avatar = ? "
+            + "WHERE id = UUID_TO_BIN(?, true)",
+        entity.getUsername(),
+        entity.getFirstname(),
+        entity.getLastname(),
+        entity.getAvatar() != null ? entity.getAvatar().getBytes() : null,
+        entity.getId().toString()
+    );
+
+    return entity;
+  }
+
+  @Override
   public void delete(UserEntity entity) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.rccApiJdbcUrl()));
 

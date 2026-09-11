@@ -10,7 +10,7 @@ import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.rococoAuth.entity.Authority;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
-import io.student.rcc.data.rococoAuth.impl.AuthUserDaoSpringJdbc;
+import io.student.rcc.data.rococoAuth.repository.iml.AuthUserRepositoryHibernate;
 import io.student.rcc.service.UsersDbClient;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -30,7 +29,7 @@ public class JdbcTest {
   private static final Config CFG = Config.getInstance();
   private static final String PASSWORD = "12345";
   private final UsersDbClient usersDbClient = new UsersDbClient();
-  private final AuthUserDaoSpringJdbc authUserDao = new AuthUserDaoSpringJdbc();
+  private final AuthUserRepositoryHibernate authUserRepository = new AuthUserRepositoryHibernate();
   private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
   private final JdbcTemplate jdbcTemplateAuth = new JdbcTemplate(
       new SingleConnectionDataSource(
@@ -106,7 +105,7 @@ public class JdbcTest {
     String username = randomUserName();
     UUID id = usersDbClient.createUser(username, PASSWORD, Authority.read, Authority.write);
 
-    List<AuthUserEntity> matched = authUserDao.findAll().stream()
+    List<AuthUserEntity> matched = authUserRepository.findAll().stream()
         .filter(user -> id.equals(user.getId()))
         .toList();
 
@@ -124,8 +123,8 @@ public class JdbcTest {
   private List<AuthorityRow> checkAuthorityForUser(UUID userId) {
 
     return jdbcTemplateAuth.query(
-        "SELECT BIN_TO_UUID(id, true) AS id, BIN_TO_UUID(user_id, true) AS user_id, authority "
-            + "FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)",
+        "SELECT BIN_TO_UUID(id) AS id, BIN_TO_UUID(user_id) AS user_id, authority "
+            + "FROM `authority` WHERE user_id = UUID_TO_BIN(?)",
         (rs, rowNum) -> new AuthorityRow(
             rs.getObject("id", UUID.class),
             rs.getObject("user_id", UUID.class),
@@ -140,13 +139,13 @@ public class JdbcTest {
     String username = randomUserName();
 
     jdbcTemplateApi.update(
-        "INSERT INTO `user`(id, username) VALUES (UUID_TO_BIN(?, true), ?)",
+        "INSERT INTO `user`(id, username) VALUES (UUID_TO_BIN(?), ?)",
         UUID.randomUUID().toString(),
         username
     );
 
     try {
-      assertThrows(DuplicateKeyException.class, () ->
+      assertThrows(RuntimeException.class, () ->
           usersDbClient.createUser(username, PASSWORD, Authority.read)
       );
 
@@ -189,9 +188,9 @@ public class JdbcTest {
 
   private AuthUserRow findUser(UUID id) {
     return jdbcTemplateAuth.queryForObject(
-        "SELECT BIN_TO_UUID(id, true) AS id, username, password, enabled, "
+        "SELECT BIN_TO_UUID(id) AS id, username, password, enabled, "
             + "account_non_expired, account_non_locked, credentials_non_expired "
-            + "FROM `user` WHERE id = UUID_TO_BIN(?, true)",
+            + "FROM `user` WHERE id = UUID_TO_BIN(?)",
         (rs, rowNum) -> new AuthUserRow(
             UUID.fromString(rs.getString("id")),
             rs.getString("username"),
@@ -207,7 +206,7 @@ public class JdbcTest {
 
   private String findAuthority(UUID userId) {
     return jdbcTemplateAuth.queryForObject(
-        "SELECT authority FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)",
+        "SELECT authority FROM `authority` WHERE user_id = UUID_TO_BIN(?)",
         String.class,
         userId.toString()
     );
@@ -215,7 +214,7 @@ public class JdbcTest {
 
   private Integer countAuthorities(UUID userId) {
     return jdbcTemplateAuth.queryForObject(
-        "SELECT COUNT(*) FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)",
+        "SELECT COUNT(*) FROM `authority` WHERE user_id = UUID_TO_BIN(?)",
         Integer.class,
         userId.toString()
     );

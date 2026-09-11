@@ -3,7 +3,6 @@ package io.student.rcc.data.rococoAuth.repository.iml;
 import static io.student.rcc.data.tpl.Connections.holder;
 
 import io.student.rcc.config.Config;
-import io.student.rcc.data.rococoAuth.UserDao;
 import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import io.student.rcc.data.rococoAuth.repository.UserRepository;
 import java.sql.PreparedStatement;
@@ -94,6 +93,24 @@ public class UserRepositoryJdbc implements UserRepository {
         }
         return Optional.empty();
       }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public UserEntity update(UserEntity entity) {
+    try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
+        "UPDATE `user` SET username = ?, firstname = ?, lastname = ?, avatar = ? "
+            + "WHERE id = UUID_TO_BIN(?, true)"
+    )) {
+      ps.setString(1, entity.getUsername());
+      ps.setString(2, entity.getFirstname());
+      ps.setString(3, entity.getLastname());
+      ps.setBytes(4, entity.getAvatar() != null ? entity.getAvatar().getBytes() : null);
+      ps.setString(5, entity.getId().toString());
+      ps.executeUpdate();
+      return entity;
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }

@@ -13,11 +13,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-public class PaintingDaoSpringJdbc implements PaintingDao {
+public class PaintingSpringJdbcDao implements PaintingDao {
 
   private final DataSource dataSource;
 
-  public PaintingDaoSpringJdbc(DataSource dataSource) {
+  public PaintingSpringJdbcDao(DataSource dataSource) {
     this.dataSource = dataSource;
   }
 

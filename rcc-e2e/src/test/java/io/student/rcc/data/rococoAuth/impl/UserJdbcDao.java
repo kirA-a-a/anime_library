@@ -99,6 +99,24 @@ public class UserJdbcDao implements UserDao {
   }
 
   @Override
+  public UserEntity update(UserEntity entity) {
+    try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
+        "UPDATE `user` SET username = ?, firstname = ?, lastname = ?, avatar = ? "
+            + "WHERE id = UUID_TO_BIN(?, true)"
+    )) {
+      ps.setString(1, entity.getUsername());
+      ps.setString(2, entity.getFirstname());
+      ps.setString(3, entity.getLastname());
+      ps.setBytes(4, entity.getAvatar() != null ? entity.getAvatar().getBytes() : null);
+      ps.setString(5, entity.getId().toString());
+      ps.executeUpdate();
+      return entity;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
   public void delete(UserEntity entity) {
     try (PreparedStatement ps = holder(CFG.rccApiJdbcUrl()).connection().prepareStatement(
         "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)"

@@ -13,7 +13,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class AuthUserDaoSpringJdbc implements AuthUserDao {
+public class AuthUserSpringJdbcDao implements AuthUserDao {
 
   private static final Config CFG = Config.getInstance();
   private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -76,12 +76,48 @@ public class AuthUserDaoSpringJdbc implements AuthUserDao {
   }
 
   @Override
-  public void delete(UUID id) {
+  public Optional<AuthUserEntity> findByUsername(String username) {
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
+
+    List<AuthUserEntity> users = jdbcTemplate.query(
+        USER_WITH_AUTHORITIES_SELECT + " WHERE u.username = ?",
+        AuthUserWithAuthoritiesExtractor.instance,
+        username
+    );
+    return users.isEmpty() ? Optional.empty() : Optional.of(users.getFirst());
+  }
+
+  @Override
+  public AuthUserEntity update(AuthUserEntity user) {
     JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
 
     jdbcTemplate.update(
+        "UPDATE `user` SET username = ?, password = ?, enabled = ?, "
+            + "account_non_expired = ?, account_non_locked = ?, credentials_non_expired = ? "
+            + "WHERE id = UUID_TO_BIN(?, true)",
+        user.getUsername(),
+        passwordEncoder.encode(user.getPassword()),
+        user.isEnabled(),
+        user.isAccountNonExpired(),
+        user.isAccountNonLocked(),
+        user.isCredentialsNonExpired(),
+        user.getId().toString()
+    );
+
+    return user;
+  }
+
+  @Override
+  public void delete(AuthUserEntity user) {
+    JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
+
+    jdbcTemplate.update(
+        "DELETE FROM `authority` WHERE user_id = UUID_TO_BIN(?, true)",
+        user.getId().toString()
+    );
+    jdbcTemplate.update(
         "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)",
-        id.toString()
+        user.getId().toString()
     );
   }
 }

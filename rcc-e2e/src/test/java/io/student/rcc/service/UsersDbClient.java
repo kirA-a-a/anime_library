@@ -7,31 +7,75 @@ import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import io.student.rcc.data.rococoAuth.repository.AuthUserRepository;
 import io.student.rcc.data.rococoAuth.repository.UserRepository;
-import io.student.rcc.data.rococoAuth.repository.iml.AuthUserRepositoryJdbc;
-import io.student.rcc.data.rococoAuth.repository.iml.UserRepositoryJdbc;
-import io.student.rcc.data.tpl.DataSources;
+import io.student.rcc.data.rococoAuth.repository.iml.AuthUserRepositoryHibernate;
+import io.student.rcc.data.rococoAuth.repository.iml.UserRepositoryHibernate;
+import io.student.rcc.data.tpl.XaTransactionTemplate;
 import io.student.rcc.model.UserJson;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import javax.sql.DataSource;
-import org.springframework.data.transaction.ChainedTransactionManager;
-import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 public class UsersDbClient implements UsersClient {
 
   private final static Config CFG = Config.getInstance();
-  private final AuthUserRepository authUserRepository = new AuthUserRepositoryJdbc();
-  private final UserRepository userRepository = new UserRepositoryJdbc();
+  private final AuthUserRepository authUserRepository = new AuthUserRepositoryHibernate();
+  private final UserRepository userRepository = new UserRepositoryHibernate();
 
-  private final DataSource authDs = DataSources.dataSource(CFG.authJdbcUrl());
-  private final DataSource apiDs = DataSources.dataSource(CFG.rccApiJdbcUrl());
-
-  private final TransactionTemplate txTemplate = new TransactionTemplate(
-      new ChainedTransactionManager(
-          new JdbcTransactionManager(authDs),
-          new JdbcTransactionManager(apiDs)
-      )
+  private final XaTransactionTemplate xaTemplate = new XaTransactionTemplate(
+      CFG.authJdbcUrl(),
+      CFG.rccApiJdbcUrl()
   );
+
+  private static final String DEFAULT_PASSWORD = "12345";
+
+  @Override
+  public UserJson create(UserJson user) {
+    UUID id = createUser(user.username(), DEFAULT_PASSWORD);
+    return update(new UserJson(
+        id,
+        user.username(),
+        user.firstname(),
+        user.lastname(),
+        user.avatar()
+    ));
+  }
+
+  @Override
+  public Optional<UserJson> findById(UUID id) {
+    return xaTemplate.execute(() ->
+        userRepository.findById(id).map(UserJson::fromEntity)
+    );
+  }
+
+  @Override
+  public Optional<UserJson> findByUsername(String username) {
+    return xaTemplate.execute(() ->
+        userRepository.findByUsername(username).map(UserJson::fromEntity)
+    );
+  }
+
+  @Override
+  public List<UserJson> findAll() {
+    return xaTemplate.execute(() ->
+        userRepository.findAll().stream().map(UserJson::fromEntity).toList()
+    );
+  }
+
+  @Override
+  public UserJson update(UserJson user) {
+    return xaTemplate.execute(() -> {
+      UserEntity entity = userRepository.findByUsername(user.username())
+          .or(() -> userRepository.findById(user.id()))
+          .orElseThrow(() -> new IllegalArgumentException(
+              "User not found: " + user.username()
+          ));
+      entity.setUsername(user.username());
+      entity.setFirstname(user.firstname());
+      entity.setLastname(user.lastname());
+      entity.setAvatar(user.avatar());
+      return UserJson.fromEntity(userRepository.update(entity));
+    });
+  }
 
   @Override
   public UUID createUser(String username, String password) {
@@ -39,7 +83,7 @@ public class UsersDbClient implements UsersClient {
   }
 
   public UUID createUser(String username, String password, Authority... authorities) {
-    return txTemplate.execute(status -> {
+    return xaTemplate.execute(() -> {
 
       AuthUserEntity authUser = new AuthUserEntity();
       authUser.setUsername(username);
@@ -69,14 +113,13 @@ public class UsersDbClient implements UsersClient {
 
   @Override
   public void delete(UserJson user) {
-    txTemplate.execute(
-        status -> {
-          authUserRepository.delete(user.id());
+    xaTemplate.execute(() -> {
+      AuthUserEntity authUser = new AuthUserEntity();
+      authUser.setId(user.id());
+      authUserRepository.delete(authUser);
 
-          userRepository.findByUsername(user.username()).ifPresent(userRepository::delete);
-
-          return null;
-        }
-    );
+      userRepository.delete(UserEntity.fromJson(user));
+      return null;
+    });
   }
 }

@@ -11,10 +11,11 @@ public interface UserDao {
 
   Optional<UserEntity> findById(UUID id);
 
-  List<UserEntity> findAll();
-
   Optional<UserEntity> findByUsername(String username);
 
-  void delete(UserEntity entity);
+  List<UserEntity> findAll();
 
+  UserEntity update(UserEntity entity);
+
+  void delete(UserEntity entity);
 }

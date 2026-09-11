@@ -12,7 +12,7 @@ import java.util.UUID;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-public class AuthAuthorityDaoSpringJdbc implements AuthAuthorityDao {
+public class AuthAuthoritySpringJdbcDao implements AuthAuthorityDao {
 
   private static final Config CFG = Config.getInstance();
 

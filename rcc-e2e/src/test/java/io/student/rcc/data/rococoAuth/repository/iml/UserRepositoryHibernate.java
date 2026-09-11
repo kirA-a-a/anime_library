@@ -6,7 +6,6 @@ import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import io.student.rcc.data.rococoAuth.repository.UserRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,17 +42,19 @@ public class UserRepositoryHibernate implements UserRepository {
 
   @Override
   public Optional<UserEntity> findByUsername(String username) {
+    return entityManager.createQuery(
+            "SELECT u FROM UserEntity u WHERE u.username = :username",
+            UserEntity.class
+        )
+        .setParameter("username", username)
+        .getResultStream()
+        .findFirst();
+  }
 
-    try {
-      return Optional.of(entityManager.createQuery(
-              "SELECT u FROM UserEntity u WHERE u.username = :username",
-              UserEntity.class
-          )
-          .setParameter("username", username)
-          .getSingleResult());
-    } catch (NoResultException e) {
-      return Optional.empty();
-    }
+  @Override
+  public UserEntity update(UserEntity entity) {
+    entityManager.joinTransaction();
+    return entityManager.merge(entity);
   }
 
   @Override

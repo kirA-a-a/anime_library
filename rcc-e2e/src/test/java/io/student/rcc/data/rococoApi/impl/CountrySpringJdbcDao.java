@@ -13,11 +13,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-public class CountryDaoSpringJdbc implements CountryDao {
+public class CountrySpringJdbcDao implements CountryDao {
 
   private final DataSource dataSource;
 
-  public CountryDaoSpringJdbc(DataSource dataSource) {
+  public CountrySpringJdbcDao(DataSource dataSource) {
     this.dataSource = dataSource;
   }
 

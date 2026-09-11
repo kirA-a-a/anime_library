@@ -89,11 +89,52 @@ public class AuthUserJdbcDao implements AuthUserDao {
   }
 
   @Override
-  public void delete(UUID id) {
+  public Optional<AuthUserEntity> findByUsername(String username) {
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+        "SELECT BIN_TO_UUID(id, true) as id, username, password, enabled, "
+            + "account_non_expired, account_non_locked, credentials_non_expired "
+            + "FROM `user` WHERE username = ?"
+    )) {
+      ps.setString(1, username);
+
+      try (ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+          return Optional.of(mapAuthUser(rs));
+        }
+        return Optional.empty();
+      }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public AuthUserEntity update(AuthUserEntity user) {
+    try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+        "UPDATE `user` SET username = ?, password = ?, enabled = ?, "
+            + "account_non_expired = ?, account_non_locked = ?, credentials_non_expired = ? "
+            + "WHERE id = UUID_TO_BIN(?, true)"
+    )) {
+      ps.setString(1, user.getUsername());
+      ps.setString(2, passwordEncoder.encode(user.getPassword()));
+      ps.setBoolean(3, user.isEnabled());
+      ps.setBoolean(4, user.isAccountNonExpired());
+      ps.setBoolean(5, user.isAccountNonLocked());
+      ps.setBoolean(6, user.isCredentialsNonExpired());
+      ps.setString(7, user.getId().toString());
+      ps.executeUpdate();
+      return user;
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Override
+  public void delete(AuthUserEntity user) {
     try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
         "DELETE FROM `user` WHERE id = UUID_TO_BIN(?, true)"
     )) {
-      ps.setString(1, id.toString());
+      ps.setString(1, user.getId().toString());
       ps.executeUpdate();
     } catch (SQLException e) {
       throw new RuntimeException(e);

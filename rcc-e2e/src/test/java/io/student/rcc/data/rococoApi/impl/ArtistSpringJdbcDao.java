@@ -13,11 +13,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-public class ArtistDaoSpringJdbc implements ArtistDao {
+public class ArtistSpringJdbcDao implements ArtistDao {
 
   private final DataSource dataSource;
 
-  public ArtistDaoSpringJdbc(DataSource dataSource) {
+  public ArtistSpringJdbcDao(DataSource dataSource) {
     this.dataSource = dataSource;
   }
 

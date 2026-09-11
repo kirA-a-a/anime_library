@@ -2,9 +2,11 @@ package io.student.rcc.service;
 
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoApi.entity.ArtistEntity;
-import io.student.rcc.data.rococoApi.impl.ArtistDaoSpringJdbc;
+import io.student.rcc.data.rococoApi.repository.ArtistRepository;
+import io.student.rcc.data.rococoApi.repository.iml.ArtistRepositoryHibernate;
 import io.student.rcc.data.tpl.DataSources;
 import io.student.rcc.model.ArtistJson;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -20,35 +22,47 @@ public class ArtistsDbClient implements ArtistsClient {
       )
   );
 
-  private final ArtistDaoSpringJdbc artistDao = new ArtistDaoSpringJdbc(
-      DataSources.dataSource(CFG.rccApiJdbcUrl())
-  );
+  private final ArtistRepository artistRepository = new ArtistRepositoryHibernate();
 
   @Override
   public ArtistJson create(ArtistJson artist) {
     return txTemplate.execute(status ->
-        ArtistJson.fromEntity(artistDao.create(ArtistEntity.fromJson(artist)))
+        ArtistJson.fromEntity(artistRepository.create(ArtistEntity.fromJson(artist)))
     );
   }
 
   @Override
   public Optional<ArtistJson> findById(UUID id) {
     return txTemplate.execute(status ->
-        artistDao.findById(id).map(ArtistJson::fromEntity)
+        artistRepository.findById(id).map(ArtistJson::fromEntity)
     );
   }
 
   @Override
   public Optional<ArtistJson> findByName(String name) {
     return txTemplate.execute(status ->
-        artistDao.findByName(name).map(ArtistJson::fromEntity)
+        artistRepository.findByName(name).map(ArtistJson::fromEntity)
+    );
+  }
+
+  @Override
+  public List<ArtistJson> findAll() {
+    return txTemplate.execute(status ->
+        artistRepository.findAll().stream().map(ArtistJson::fromEntity).toList()
+    );
+  }
+
+  @Override
+  public ArtistJson update(ArtistJson artist) {
+    return txTemplate.execute(status ->
+        ArtistJson.fromEntity(artistRepository.update(ArtistEntity.fromJson(artist)))
     );
   }
 
   @Override
   public void delete(ArtistJson artist) {
     txTemplate.executeWithoutResult(status ->
-        artistDao.delete(ArtistEntity.fromJson(artist))
+        artistRepository.delete(ArtistEntity.fromJson(artist))
     );
   }
 }

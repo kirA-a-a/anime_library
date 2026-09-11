@@ -2,9 +2,11 @@ package io.student.rcc.service;
 
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoApi.entity.PaintingEntity;
-import io.student.rcc.data.rococoApi.impl.PaintingDaoSpringJdbc;
+import io.student.rcc.data.rococoApi.repository.PaintingRepository;
+import io.student.rcc.data.rococoApi.repository.iml.PaintingRepositoryHibernate;
 import io.student.rcc.data.tpl.DataSources;
 import io.student.rcc.model.PaintingJson;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -20,35 +22,47 @@ public class PaintingsDbClient implements PaintingsClient {
       )
   );
 
-  private final PaintingDaoSpringJdbc paintingDao = new PaintingDaoSpringJdbc(
-      DataSources.dataSource(CFG.rccApiJdbcUrl())
-  );
+  private final PaintingRepository paintingRepository = new PaintingRepositoryHibernate();
 
   @Override
   public PaintingJson create(PaintingJson painting) {
     return txTemplate.execute(status ->
-        PaintingJson.fromEntity(paintingDao.create(PaintingEntity.fromJson(painting)))
+        PaintingJson.fromEntity(paintingRepository.create(PaintingEntity.fromJson(painting)))
     );
   }
 
   @Override
   public Optional<PaintingJson> findById(UUID id) {
     return txTemplate.execute(status ->
-        paintingDao.findById(id).map(PaintingJson::fromEntity)
+        paintingRepository.findById(id).map(PaintingJson::fromEntity)
     );
   }
 
   @Override
   public Optional<PaintingJson> findByTitle(String title) {
     return txTemplate.execute(status ->
-        paintingDao.findByTitle(title).map(PaintingJson::fromEntity)
+        paintingRepository.findByTitle(title).map(PaintingJson::fromEntity)
+    );
+  }
+
+  @Override
+  public List<PaintingJson> findAll() {
+    return txTemplate.execute(status ->
+        paintingRepository.findAll().stream().map(PaintingJson::fromEntity).toList()
+    );
+  }
+
+  @Override
+  public PaintingJson update(PaintingJson painting) {
+    return txTemplate.execute(status ->
+        PaintingJson.fromEntity(paintingRepository.update(PaintingEntity.fromJson(painting)))
     );
   }
 
   @Override
   public void delete(PaintingJson painting) {
     txTemplate.executeWithoutResult(status ->
-        paintingDao.delete(PaintingEntity.fromJson(painting))
+        paintingRepository.delete(PaintingEntity.fromJson(painting))
     );
   }
 }

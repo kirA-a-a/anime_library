@@ -13,11 +13,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-public class MuseumDaoSpringJdbc implements MuseumDao {
+public class MuseumSpringJdbcDao implements MuseumDao {
 
   private final DataSource dataSource;
 
-  public MuseumDaoSpringJdbc(DataSource dataSource) {
+  public MuseumSpringJdbcDao(DataSource dataSource) {
     this.dataSource = dataSource;
   }
 
