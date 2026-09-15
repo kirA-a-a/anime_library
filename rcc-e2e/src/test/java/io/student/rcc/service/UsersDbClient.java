@@ -2,13 +2,11 @@ package io.student.rcc.service;
 
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
-import io.student.rcc.data.rococoAuth.entity.Authority;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
+import io.student.rcc.data.rococoAuth.entity.Authority;
 import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import io.student.rcc.data.rococoAuth.repository.AuthUserRepository;
 import io.student.rcc.data.rococoAuth.repository.UserRepository;
-import io.student.rcc.data.rococoAuth.repository.iml.AuthUserRepositoryHibernate;
-import io.student.rcc.data.rococoAuth.repository.iml.UserRepositoryHibernate;
 import io.student.rcc.data.tpl.XaTransactionTemplate;
 import io.student.rcc.model.UserJson;
 import java.util.List;
@@ -18,8 +16,8 @@ import java.util.UUID;
 public class UsersDbClient implements UsersClient {
 
   private final static Config CFG = Config.getInstance();
-  private final AuthUserRepository authUserRepository = new AuthUserRepositoryHibernate();
-  private final UserRepository userRepository = new UserRepositoryHibernate();
+  private final AuthUserRepository authUserRepository = AuthUserRepository.getInstance();
+  private final UserRepository userRepository = UserRepository.getInstance();
 
   private final XaTransactionTemplate xaTemplate = new XaTransactionTemplate(
       CFG.authJdbcUrl(),
