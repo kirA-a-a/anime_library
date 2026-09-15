@@ -2,7 +2,7 @@ package io.student.rcc.data.rococoAuth.repository.iml;
 
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
-import io.student.rcc.data.rococoAuth.mapper.AuthUserEntityRowMapper;
+import io.student.rcc.data.rococoAuth.mapper.AuthUserWithAuthoritiesExtractor;
 import io.student.rcc.data.rococoAuth.repository.AuthUserRepository;
 import io.student.rcc.data.tpl.DataSources;
 import java.util.List;
@@ -18,10 +18,14 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
   private final PasswordEncoder passwordEncoder =
       PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-  private static final String USER_SELECT =
-      "SELECT BIN_TO_UUID(id, true) AS id, username, password, enabled, "
-          + "account_non_expired, account_non_locked, credentials_non_expired "
-          + "FROM `user`";
+  private static final String USER_WITH_AUTHORITIES_SELECT =
+      "SELECT BIN_TO_UUID(u.id, true) AS id, u.username, u.password, u.enabled, "
+          + "u.account_non_expired, u.account_non_locked, u.credentials_non_expired, "
+          + "BIN_TO_UUID(a.id, true) AS authority_id, "
+          + "BIN_TO_UUID(a.user_id, true) AS user_id, "
+          + "a.authority AS authority "
+          + "FROM `user` u "
+          + "LEFT JOIN `authority` a ON u.id = a.user_id";
 
   private JdbcTemplate jdbcTemplate() {
     return new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
@@ -51,8 +55,8 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
   @Override
   public Optional<AuthUserEntity> findById(UUID id) {
     List<AuthUserEntity> result = jdbcTemplate().query(
-        USER_SELECT + " WHERE id = UUID_TO_BIN(?, true)",
-        AuthUserEntityRowMapper.instance,
+        USER_WITH_AUTHORITIES_SELECT + " WHERE u.id = UUID_TO_BIN(?, true)",
+        AuthUserWithAuthoritiesExtractor.instance,
         id.toString()
     );
     return result.stream().findFirst();
@@ -61,8 +65,8 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
   @Override
   public Optional<AuthUserEntity> findByUsername(String username) {
     List<AuthUserEntity> result = jdbcTemplate().query(
-        USER_SELECT + " WHERE username = ?",
-        AuthUserEntityRowMapper.instance,
+        USER_WITH_AUTHORITIES_SELECT + " WHERE u.username = ?",
+        AuthUserWithAuthoritiesExtractor.instance,
         username
     );
     return result.stream().findFirst();
@@ -70,7 +74,8 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
 
   @Override
   public List<AuthUserEntity> findAll() {
-    return jdbcTemplate().query(USER_SELECT, AuthUserEntityRowMapper.instance);
+    return jdbcTemplate()
+        .query(USER_WITH_AUTHORITIES_SELECT, AuthUserWithAuthoritiesExtractor.instance);
   }
 
   @Override
