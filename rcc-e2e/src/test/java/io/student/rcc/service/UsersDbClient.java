@@ -112,11 +112,8 @@ public class UsersDbClient implements UsersClient {
   @Override
   public void delete(UserJson user) {
     xaTemplate.execute(() -> {
-      AuthUserEntity authUser = new AuthUserEntity();
-      authUser.setId(user.id());
-      authUserRepository.delete(authUser);
-
-      userRepository.delete(UserEntity.fromJson(user));
+      authUserRepository.findById(user.id()).ifPresent(authUserRepository::delete);
+      userRepository.findByUsername(user.username()).ifPresent(userRepository::delete);
       return null;
     });
   }
