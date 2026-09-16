@@ -57,7 +57,7 @@ public class PaintingsDbClient implements PaintingsClient {
   @Override
   public void delete(PaintingJson painting) {
     xaTemplate.execute(() -> {
-      paintingRepository.delete(PaintingEntity.fromJson(painting));
+      paintingRepository.findById(painting.id()).ifPresent(paintingRepository::delete);
       return null;
     });
   }

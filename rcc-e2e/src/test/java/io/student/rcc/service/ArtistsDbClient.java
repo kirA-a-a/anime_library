@@ -57,7 +57,7 @@ public class ArtistsDbClient implements ArtistsClient {
   @Override
   public void delete(ArtistJson artist) {
     xaTemplate.execute(() -> {
-      artistRepository.delete(ArtistEntity.fromJson(artist));
+      artistRepository.findById(artist.id()).ifPresent(artistRepository::delete);
       return null;
     });
   }

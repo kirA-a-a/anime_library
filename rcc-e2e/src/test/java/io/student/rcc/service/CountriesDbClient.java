@@ -57,7 +57,7 @@ public class CountriesDbClient implements CountriesClient {
   @Override
   public void delete(CountryJson country) {
     xaTemplate.execute(() -> {
-      countryRepository.delete(CountryEntity.fromJson(country));
+      countryRepository.findById(country.id()).ifPresent(countryRepository::delete);
       return null;
     });
   }

@@ -57,7 +57,7 @@ public class MuseumsDbClient implements MuseumsClient {
   @Override
   public void delete(MuseumJson museum) {
     xaTemplate.execute(() -> {
-      museumRepository.delete(MuseumEntity.fromJson(museum));
+      museumRepository.findById(museum.id()).ifPresent(museumRepository::delete);
       return null;
     });
   }

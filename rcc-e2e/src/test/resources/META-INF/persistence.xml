@@ -16,7 +16,7 @@
       <property name="hibernate.transaction.jta.platform"
                 value="com.atomikos.icatch.jta.hibernate4.AtomikosPlatform"/>
       <property name="hibernate.connection.handling_mode"
-                value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_STATEMENT"/>
+                value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION"/>
       <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
     </properties>
   </persistence-unit>
@@ -36,7 +36,7 @@
       <property name="hibernate.transaction.jta.platform"
                 value="com.atomikos.icatch.jta.hibernate4.AtomikosPlatform"/>
       <property name="hibernate.connection.handling_mode"
-                value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_STATEMENT"/>
+                value="DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION"/>
       <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
     </properties>
   </persistence-unit>
