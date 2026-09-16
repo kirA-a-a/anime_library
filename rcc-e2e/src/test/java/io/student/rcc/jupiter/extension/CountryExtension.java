@@ -7,7 +7,6 @@ import io.student.rcc.service.CountriesDbClient;
 import io.student.rcc.utils.RandomUserDataUtils;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -25,27 +24,25 @@ public class CountryExtension implements BeforeEachCallback, AfterEachCallback, 
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
+    AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
+        .ifPresent(userAnnotation ->
+            Arrays.stream(userAnnotation.countries()).findFirst().ifPresent(countryAnnotation -> {
+              CountryJson country = client.create(new CountryJson(
+                  null,
+                  countryAnnotation.name().isEmpty()
+                      ? RandomUserDataUtils.randomName()
+                      : countryAnnotation.name()
+              ));
+              context.getStore(NAMESPACE).put(context.getUniqueId(), country);
 
-    AnnotationSupport.findAnnotation(
-        context.getRequiredTestMethod(),
-        User.class
-    ).ifPresent(
-        userAnnotation -> {
-          Arrays.stream(userAnnotation.countries()).findFirst().ifPresent(
-              countryAnnotation -> {
-                UUID id = UUID.randomUUID();
-                CountryJson country = new CountryJson(
-                    id,
-                    countryAnnotation.name().isEmpty() ? RandomUserDataUtils.randomName()
-                        : countryAnnotation.name()
-                );
-                context.getStore(NAMESPACE).put(context.getUniqueId(), client.create(country));
-              }
-          );
-
-        }
-    );
-
+              TestData testData = context.getStore(TestData.NAMESPACE)
+                  .get(context.getUniqueId(), TestData.class);
+              context.getStore(TestData.NAMESPACE).put(
+                  context.getUniqueId(),
+                  testData.withCountry(country)
+              );
+            })
+        );
   }
 
   @Override
@@ -58,7 +55,6 @@ public class CountryExtension implements BeforeEachCallback, AfterEachCallback, 
   public boolean supportsParameter(ParameterContext parameterContext,
       ExtensionContext extensionContext) throws ParameterResolutionException {
     return parameterContext.getParameter().getType().equals(CountryJson.class);
-
   }
 
   @Override

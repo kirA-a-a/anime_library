@@ -1,7 +1,7 @@
 package io.student.rcc.jupiter.extension;
 
-import static io.student.rcc.utils.RandomUserDataUtils.randomName;
 import static io.student.rcc.utils.RandomUserDataUtils.randomLastName;
+import static io.student.rcc.utils.RandomUserDataUtils.randomName;
 import static io.student.rcc.utils.RandomUserDataUtils.randomUserName;
 
 import io.student.rcc.jupiter.annotation.User;
@@ -23,8 +23,8 @@ public class UserExtension implements BeforeEachCallback, AfterEachCallback, Par
 
   public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(
       UserExtension.class);
-  private final UsersClient usersClient = new UsersDbClient();
-  private final static String DEFAULT_PASSWORD = "12345";
+  private final UsersClient client = new UsersDbClient();
+  private static final String DEFAULT_PASSWORD = "12345";
 
   @Override
   public void beforeEach(ExtensionContext context) {
@@ -32,10 +32,11 @@ public class UserExtension implements BeforeEachCallback, AfterEachCallback, Par
         context.getRequiredTestMethod(),
         User.class
     ).ifPresent(
-        annotation -> {
-          String username =
-              annotation.username().isEmpty() ? randomUserName() : annotation.username();
-          UUID id = usersClient.createUser(username, DEFAULT_PASSWORD);
+        userAnnotation -> {
+          String username = userAnnotation.username().isEmpty()
+              ? randomUserName()
+              : userAnnotation.username();
+          UUID id = client.createUser(username, DEFAULT_PASSWORD);
           UserJson user = new UserJson(
               id,
               username,
@@ -43,9 +44,10 @@ public class UserExtension implements BeforeEachCallback, AfterEachCallback, Par
               randomLastName(),
               null
           );
-          context.getStore(NAMESPACE).put(
+          context.getStore(NAMESPACE).put(context.getUniqueId(), user);
+          context.getStore(TestData.NAMESPACE).put(
               context.getUniqueId(),
-              user
+              TestData.empty().withUser(user)
           );
         }
     );
@@ -54,7 +56,7 @@ public class UserExtension implements BeforeEachCallback, AfterEachCallback, Par
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
     Optional.ofNullable(context.getStore(NAMESPACE).get(context.getUniqueId(), UserJson.class))
-        .ifPresent(usersClient::delete);
+        .ifPresent(client::delete);
   }
 
   @Override

@@ -18,4 +18,27 @@ public record TestData(
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(
       TestData.class);
 
+  public static TestData empty() {
+    return new TestData(null, null, null, null, null);
+  }
+
+  public TestData withUser(UserJson user) {
+    return new TestData(user, country, artist, museum, painting);
+  }
+
+  public TestData withCountry(CountryJson country) {
+    return new TestData(user, country, artist, museum, painting);
+  }
+
+  public TestData withArtist(ArtistJson artist) {
+    return new TestData(user, country, artist, museum, painting);
+  }
+
+  public TestData withMuseum(MuseumJson museum) {
+    return new TestData(user, country, artist, museum, painting);
+  }
+
+  public TestData withPainting(PaintingJson painting) {
+    return new TestData(user, country, artist, museum, painting);
+  }
 }

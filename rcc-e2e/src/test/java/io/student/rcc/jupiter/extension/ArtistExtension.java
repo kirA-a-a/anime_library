@@ -7,7 +7,6 @@ import io.student.rcc.service.ArtistsDbClient;
 import io.student.rcc.utils.RandomUserDataUtils;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -20,49 +19,42 @@ import org.junit.platform.commons.support.AnnotationSupport;
 public class ArtistExtension implements BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
   private final ArtistsClient client = new ArtistsDbClient();
+  private static final String DEFAULT_IMAGE_PATH = "images/placeholder.png";
   public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(
       ArtistExtension.class
   );
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
+    AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
+        .ifPresent(userAnnotation ->
+            Arrays.stream(userAnnotation.artists()).findFirst().ifPresent(artistAnnotation -> {
+              ArtistJson artist = client.create(new ArtistJson(
+                  null,
+                  artistAnnotation.name().isEmpty()
+                      ? RandomUserDataUtils.randomArtistName()
+                      : artistAnnotation.name(),
+                  artistAnnotation.biography().isEmpty()
+                      ? RandomUserDataUtils.randomSentence(8)
+                      : artistAnnotation.biography(),
+                  DEFAULT_IMAGE_PATH
+              ));
+              context.getStore(NAMESPACE).put(context.getUniqueId(), artist);
 
-    AnnotationSupport.findAnnotation(
-        context.getRequiredTestMethod(),
-        User.class
-    ).ifPresent(
-        userAnnotation ->
-        {
-          Arrays.stream(userAnnotation.artists()).findFirst().ifPresent(
-              artistAnnotation -> {
-                UUID id = UUID.randomUUID();
-                ArtistJson artist = new ArtistJson(
-                    id,
-                    artistAnnotation.name().isEmpty() ? RandomUserDataUtils.randomArtistName()
-                        : artistAnnotation.name(),
-                    artistAnnotation.biography().isEmpty() ? RandomUserDataUtils.randomSentence(8)
-                        : artistAnnotation.biography(),
-                    RandomUserDataUtils.randomSentence(10)
-                );
-                context
-                    .getStore(NAMESPACE)
-                    .put(
-                        context.getUniqueId(),
-                        client.create(artist)
-                    );
-              }
-          );
-        }
-    );
-
+              TestData testData = context.getStore(TestData.NAMESPACE)
+                  .get(context.getUniqueId(), TestData.class);
+              context.getStore(TestData.NAMESPACE).put(
+                  context.getUniqueId(),
+                  testData.withArtist(artist)
+              );
+            })
+        );
   }
 
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
     Optional.ofNullable(context.getStore(NAMESPACE).get(context.getUniqueId(), ArtistJson.class))
-        .ifPresent(
-            client::delete
-        );
+        .ifPresent(client::delete);
   }
 
   @Override
