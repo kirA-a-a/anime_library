@@ -29,13 +29,19 @@ public class AuthUserRepositoryHibernate implements AuthUserRepository {
 
   @Override
   public Optional<AuthUserEntity> findById(UUID id) {
-    return Optional.ofNullable(entityManager.find(AuthUserEntity.class, id));
+    return entityManager.createQuery(
+            "SELECT u FROM AuthUserEntity u LEFT JOIN FETCH u.authorities WHERE u.id = :id",
+            AuthUserEntity.class
+        )
+        .setParameter("id", id)
+        .getResultStream()
+        .findFirst();
   }
 
   @Override
   public Optional<AuthUserEntity> findByUsername(String username) {
     return entityManager.createQuery(
-            "SELECT u FROM AuthUserEntity u WHERE u.username = :username",
+            "SELECT u FROM AuthUserEntity u LEFT JOIN FETCH u.authorities WHERE u.username = :username",
             AuthUserEntity.class
         )
         .setParameter("username", username)
@@ -46,7 +52,7 @@ public class AuthUserRepositoryHibernate implements AuthUserRepository {
   @Override
   public List<AuthUserEntity> findAll() {
     return entityManager.createQuery(
-            "SELECT u FROM AuthUserEntity u",
+            "SELECT u FROM AuthUserEntity u LEFT JOIN FETCH u.authorities",
             AuthUserEntity.class
         )
         .getResultList();
