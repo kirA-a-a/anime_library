@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -69,7 +70,7 @@ public class AuthUserEntity {
     authority.setUser(null);
   }
 
-  public static AuthUserEntity fromJson(AuthUserJson json) {
+  public static @Nonnull AuthUserEntity fromJson(AuthUserJson json) {
     AuthUserEntity entity = new AuthUserEntity();
     entity.setId(json.id());
     entity.setUsername(json.username());

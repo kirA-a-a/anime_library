@@ -24,19 +24,13 @@ public class PaintingRepositoryHibernate implements PaintingRepository {
 
   @Override
   public Optional<PaintingEntity> findById(UUID id) {
-    return entityManager.createQuery(
-            "SELECT p FROM PaintingEntity p JOIN FETCH p.artist WHERE p.id = :id",
-            PaintingEntity.class
-        )
-        .setParameter("id", id)
-        .getResultStream()
-        .findFirst();
+    return Optional.ofNullable(entityManager.find(PaintingEntity.class, id));
   }
 
   @Override
   public List<PaintingEntity> findAll() {
     return entityManager.createQuery(
-            "SELECT p FROM PaintingEntity p JOIN FETCH p.artist",
+            "SELECT p FROM PaintingEntity p",
             PaintingEntity.class
         )
         .getResultList();
@@ -45,7 +39,7 @@ public class PaintingRepositoryHibernate implements PaintingRepository {
   @Override
   public Optional<PaintingEntity> findByTitle(String title) {
     return entityManager.createQuery(
-            "SELECT p FROM PaintingEntity p JOIN FETCH p.artist WHERE p.title = :title",
+            "SELECT p FROM PaintingEntity p WHERE p.title = :title",
             PaintingEntity.class
         )
         .setParameter("title", title)
@@ -62,6 +56,6 @@ public class PaintingRepositoryHibernate implements PaintingRepository {
   @Override
   public void delete(PaintingEntity entity) {
     entityManager.joinTransaction();
-    entityManager.remove(entity);
+    entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
   }
 }

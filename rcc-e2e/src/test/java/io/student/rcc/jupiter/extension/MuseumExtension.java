@@ -24,6 +24,7 @@ public class MuseumExtension implements BeforeEachCallback, AfterEachCallback, P
 
   public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(
       MuseumExtension.class);
+  private static final String DEFAULT_PHOTO = "images/museum.png";
   private final MuseumsClient client = new MuseumsDbClient();
 
   @Override
@@ -45,7 +46,9 @@ public class MuseumExtension implements BeforeEachCallback, AfterEachCallback, P
                   museumAnnotation.city().isEmpty()
                       ? randomCity()
                       : museumAnnotation.city(),
-                  randomSentence(8),
+                  museumAnnotation.content().isEmpty()
+                      ? DEFAULT_PHOTO
+                      : museumAnnotation.content(),
                   country.id()
               ));
               context.getStore(NAMESPACE).put(context.getUniqueId(), museum);

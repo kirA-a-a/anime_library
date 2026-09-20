@@ -56,6 +56,6 @@ public class CountryRepositoryHibernate implements CountryRepository {
   @Override
   public void delete(CountryEntity entity) {
     entityManager.joinTransaction();
-    entityManager.remove(entity);
+    entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
   }
 }

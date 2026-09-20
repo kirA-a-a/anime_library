@@ -2,39 +2,44 @@ package io.student.rcc.utils;
 
 import com.github.javafaker.Faker;
 import java.util.UUID;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public class RandomUserDataUtils {
 
-  public static String randomUserName() {
-    return new Faker().animal().name() + "_" + UUID.randomUUID();
+  private static final Faker FAKER = new Faker();
+
+  public static @Nonnull String randomUserName() {
+    return FAKER.animal().name() + "_" + UUID.randomUUID();
   }
 
-  public static String randomName() {
-    return new Faker().name().name();
+  public static @Nonnull String randomName() {
+    return FAKER.name().name();
   }
 
-  public static String randomLastName() {
-    return new Faker().name().lastName();
+  public static @Nonnull String randomLastName() {
+    return FAKER.name().lastName();
   }
 
-  public static String randomArtistName() {
-    return new Faker().artist().name() + "_" + UUID.randomUUID().toString().substring(0, 8);
+  public static @Nonnull String randomArtistName() {
+    return FAKER.artist().name() + "_" + UUID.randomUUID().toString().substring(0, 8);
   }
 
-  public static String randomPaintingTitle() {
-    return new Faker().book().title();
+  public static @Nonnull String randomPaintingTitle() {
+    return FAKER.book().title();
   }
 
-  public static String randomMuseumTitle() {
-    return new Faker().university().name() + "_" + UUID.randomUUID().toString().substring(0, 8);
+  public static @Nonnull String randomMuseumTitle() {
+    return FAKER.university().name() + "_" + UUID.randomUUID().toString().substring(0, 8);
   }
 
-  public static String randomCity() {
-    return new Faker().address().city();
+  public static @Nonnull String randomCity() {
+    return FAKER.address().city();
   }
 
-  public static String randomSentence(int wordsCount) {
-    return new Faker().lorem().sentence(wordsCount);
+  public static @Nonnull String randomSentence(int wordsCount) {
+    return FAKER.lorem().sentence(wordsCount);
   }
 
 }

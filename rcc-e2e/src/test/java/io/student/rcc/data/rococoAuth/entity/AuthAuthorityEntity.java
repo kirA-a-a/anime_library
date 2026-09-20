@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.Objects;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
@@ -36,7 +37,7 @@ public class AuthAuthorityEntity {
   @JoinColumn(name = "user_id")
   private AuthUserEntity user;
 
-  public static AuthAuthorityEntity fromJson(AuthAuthorityJson json) {
+  public static @Nonnull AuthAuthorityEntity fromJson(AuthAuthorityJson json) {
     AuthAuthorityEntity entity = new AuthAuthorityEntity();
     AuthUserEntity user = new AuthUserEntity();
     user.setId(json.userId());

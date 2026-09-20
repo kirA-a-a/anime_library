@@ -62,6 +62,6 @@ public class AuthUserHibernate implements AuthUserDao {
   @Override
   public void delete(AuthUserEntity user) {
     entityManager.joinTransaction();
-    entityManager.remove(user);
+    entityManager.remove(entityManager.contains(user) ? user : entityManager.merge(user));
   }
 }

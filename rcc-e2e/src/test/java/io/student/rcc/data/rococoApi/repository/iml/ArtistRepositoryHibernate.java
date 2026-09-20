@@ -56,6 +56,6 @@ public class ArtistRepositoryHibernate implements ArtistRepository {
   @Override
   public void delete(ArtistEntity entity) {
     entityManager.joinTransaction();
-    entityManager.remove(entity);
+    entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
   }
 }

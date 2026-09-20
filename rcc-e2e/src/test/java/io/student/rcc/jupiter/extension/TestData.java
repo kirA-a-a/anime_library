@@ -5,40 +5,44 @@ import io.student.rcc.model.CountryJson;
 import io.student.rcc.model.MuseumJson;
 import io.student.rcc.model.PaintingJson;
 import io.student.rcc.model.UserJson;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+@ParametersAreNonnullByDefault
 public record TestData(
-    UserJson user,
-    CountryJson country,
-    ArtistJson artist,
-    MuseumJson museum,
-    PaintingJson painting
+    @Nullable UserJson user,
+    @Nullable CountryJson country,
+    @Nullable ArtistJson artist,
+    @Nullable MuseumJson museum,
+    @Nullable PaintingJson painting
 ) {
 
   public static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(
       TestData.class);
 
-  public static TestData empty() {
+  public static @Nonnull TestData empty() {
     return new TestData(null, null, null, null, null);
   }
 
-  public TestData withUser(UserJson user) {
+  public @Nonnull TestData withUser(UserJson user) {
     return new TestData(user, country, artist, museum, painting);
   }
 
-  public TestData withCountry(CountryJson country) {
+  public @Nonnull TestData withCountry(CountryJson country) {
     return new TestData(user, country, artist, museum, painting);
   }
 
-  public TestData withArtist(ArtistJson artist) {
+  public @Nonnull TestData withArtist(ArtistJson artist) {
     return new TestData(user, country, artist, museum, painting);
   }
 
-  public TestData withMuseum(MuseumJson museum) {
+  public @Nonnull TestData withMuseum(MuseumJson museum) {
     return new TestData(user, country, artist, museum, painting);
   }
 
-  public TestData withPainting(PaintingJson painting) {
+  public @Nonnull TestData withPainting(PaintingJson painting) {
     return new TestData(user, country, artist, museum, painting);
   }
 }

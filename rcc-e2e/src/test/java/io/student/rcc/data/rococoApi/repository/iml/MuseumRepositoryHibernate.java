@@ -56,6 +56,6 @@ public class MuseumRepositoryHibernate implements MuseumRepository {
   @Override
   public void delete(MuseumEntity entity) {
     entityManager.joinTransaction();
-    entityManager.remove(entity);
+    entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
   }
 }

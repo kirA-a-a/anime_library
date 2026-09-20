@@ -103,14 +103,12 @@ public class UsersQueueExtension implements
 
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
-
     Map<Integer, StaticUser> map = context.getStore(NAMESPACE)
         .get(context.getUniqueId(), Map.class);
 
     Parameter[] parameters = context.getRequiredTestMethod().getParameters();
 
     for (Entry<Integer, StaticUser> entry : map.entrySet()) {
-
       int i = entry.getKey();
       StaticUser u = entry.getValue();
       UserType ut = parameters[i].getAnnotation(UserType.class);
@@ -121,7 +119,6 @@ public class UsersQueueExtension implements
         case Type.WITH_INCOME_REQUEST -> WITH_INCOME_REQUEST_USERS.add(u);
         case Type.WITH_OUTCOME_REQUEST -> WITH_OUTCOME_REQUEST_USERS.add(u);
       }
-
     }
   }
 

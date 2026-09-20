@@ -2,16 +2,20 @@ package io.student.rcc.model;
 
 import io.student.rcc.data.rococoAuth.entity.UserEntity;
 import java.util.UUID;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public record UserJson(
-    UUID id,
+    @Nullable UUID id,
     String username,
-    String firstname,
-    String lastname,
-    String avatar
+    @Nullable String firstname,
+    @Nullable String lastname,
+    @Nullable String avatar
 ) {
 
-  public static UserJson fromEntity(UserEntity entity) {
+  public static @Nonnull UserJson fromEntity(@Nonnull UserEntity entity) {
     return new UserJson(
         entity.getId(),
         entity.getUsername(),

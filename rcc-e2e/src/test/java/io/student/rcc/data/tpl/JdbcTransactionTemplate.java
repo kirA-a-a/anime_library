@@ -6,7 +6,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public class JdbcTransactionTemplate {
 
   private final JdbcConnectionHolder holder;
@@ -16,12 +20,12 @@ public class JdbcTransactionTemplate {
     this.holder = Connections.holder(jdbcUrl);
   }
 
-  public JdbcTransactionTemplate holdConnectionAfterAction() {
+  public @Nonnull JdbcTransactionTemplate holdConnectionAfterAction() {
     this.closedAfterAction.set(false);
     return this;
   }
 
-  public <T> T execute(Supplier<T> action, int isolationLevel) {
+  public @Nullable <T> T execute(Supplier<T> action, int isolationLevel) {
     Connection connection = null;
     try {
       connection = holder.connection();
@@ -49,7 +53,7 @@ public class JdbcTransactionTemplate {
     }
   }
 
-  public <T> T execute(Supplier<T> action) {
+  public @Nullable <T> T execute(Supplier<T> action) {
     return execute(action, TRANSACTION_READ_COMMITTED);
   }
 }

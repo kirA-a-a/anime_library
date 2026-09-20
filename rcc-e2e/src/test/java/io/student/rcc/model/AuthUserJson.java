@@ -2,9 +2,13 @@ package io.student.rcc.model;
 
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import java.util.UUID;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public record AuthUserJson(
-    UUID id,
+    @Nullable UUID id,
     String username,
     String password,
     boolean enabled,
@@ -13,7 +17,7 @@ public record AuthUserJson(
     boolean credentialsNonExpired
 ) {
 
-  public static AuthUserJson fromEntity(AuthUserEntity entity) {
+  public static @Nonnull AuthUserJson fromEntity(@Nonnull AuthUserEntity entity) {
     return new AuthUserJson(
         entity.getId(),
         entity.getUsername(),

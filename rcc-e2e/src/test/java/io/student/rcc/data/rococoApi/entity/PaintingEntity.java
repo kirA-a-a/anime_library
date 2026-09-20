@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
@@ -47,7 +48,7 @@ public class PaintingEntity {
   @Column(name = "content", columnDefinition = "LONGBLOB")
   private byte[] content;
 
-  public static PaintingEntity fromJson(PaintingJson json) {
+  public static @Nonnull PaintingEntity fromJson(PaintingJson json) {
     PaintingEntity entity = new PaintingEntity();
     entity.setId(json.id());
     entity.setTitle(json.title());

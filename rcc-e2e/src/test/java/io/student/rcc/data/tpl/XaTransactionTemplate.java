@@ -1,11 +1,15 @@
 package io.student.rcc.data.tpl;
 
 import com.atomikos.icatch.jta.UserTransactionImp;
-import jakarta.transaction.SystemException;
+import jakarta.transaction.Status;
 import jakarta.transaction.UserTransaction;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public class XaTransactionTemplate {
 
   private final JdbcConnectionHolders holders;
@@ -15,13 +19,13 @@ public class XaTransactionTemplate {
     this.holders = Connections.holders(jdbcUrl);
   }
 
-  public XaTransactionTemplate holdConnectionAfterAction() {
+  public @Nonnull XaTransactionTemplate holdConnectionAfterAction() {
     this.closedAfterAction.set(false);
     return this;
   }
 
   @SafeVarargs
-  public final <T> T execute(Supplier<T>... actions) {
+  public final @Nullable <T> T execute(Supplier<T>... actions) {
     UserTransaction ut = new UserTransactionImp();
     try {
       ut.begin();
@@ -33,9 +37,11 @@ public class XaTransactionTemplate {
       return result;
     } catch (Exception e) {
       try {
-        ut.rollback();
-      } catch (SystemException ex) {
-        throw new RuntimeException(ex);
+        if (ut.getStatus() != Status.STATUS_NO_TRANSACTION) {
+          ut.rollback();
+        }
+      } catch (Exception ex) {
+        e.addSuppressed(ex);
       }
       throw new RuntimeException(e);
     } finally {

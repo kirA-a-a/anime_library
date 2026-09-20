@@ -1,5 +1,6 @@
 package io.student.rcc.service;
 
+import io.qameta.allure.Step;
 import io.student.rcc.config.Config;
 import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
@@ -12,7 +13,11 @@ import io.student.rcc.model.UserJson;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public class UsersDbClient implements UsersClient {
 
   private final static Config CFG = Config.getInstance();
@@ -27,7 +32,8 @@ public class UsersDbClient implements UsersClient {
   private static final String DEFAULT_PASSWORD = "12345";
 
   @Override
-  public UserJson create(UserJson user) {
+  @Step("Создать пользователя: {user.username}")
+  public @Nonnull UserJson create(UserJson user) {
     UUID id = createUser(user.username(), DEFAULT_PASSWORD);
     return update(new UserJson(
         id,
@@ -39,28 +45,32 @@ public class UsersDbClient implements UsersClient {
   }
 
   @Override
-  public Optional<UserJson> findById(UUID id) {
+  @Step("Найти пользователя по id: {id}")
+  public @Nonnull Optional<UserJson> findById(UUID id) {
     return xaTemplate.execute(() ->
         userRepository.findById(id).map(UserJson::fromEntity)
     );
   }
 
   @Override
-  public Optional<UserJson> findByUsername(String username) {
+  @Step("Найти пользователя по username: {username}")
+  public @Nonnull Optional<UserJson> findByUsername(String username) {
     return xaTemplate.execute(() ->
         userRepository.findByUsername(username).map(UserJson::fromEntity)
     );
   }
 
   @Override
-  public List<UserJson> findAll() {
+  @Step("Получить всех пользователей")
+  public @Nonnull List<UserJson> findAll() {
     return xaTemplate.execute(() ->
         userRepository.findAll().stream().map(UserJson::fromEntity).toList()
     );
   }
 
   @Override
-  public UserJson update(UserJson user) {
+  @Step("Обновить пользователя: {user.username}")
+  public @Nonnull UserJson update(UserJson user) {
     return xaTemplate.execute(() -> {
       UserEntity entity = userRepository.findByUsername(user.username())
           .or(() -> userRepository.findById(user.id()))
@@ -76,11 +86,13 @@ public class UsersDbClient implements UsersClient {
   }
 
   @Override
-  public UUID createUser(String username, String password) {
-    return createUser(username, password, new Authority[0]);
+  @Step("Создать пользователя в БД: {username}")
+  public @Nonnull UUID createUser(String username, String password) {
+    return createUser(username, password, Authority.read, Authority.write);
   }
 
-  public UUID createUser(String username, String password, Authority... authorities) {
+  @Step("Создать пользователя в БД: {username} с правами {authorities}")
+  public @Nonnull UUID createUser(String username, String password, @Nullable Authority... authorities) {
     return xaTemplate.execute(() -> {
 
       AuthUserEntity authUser = new AuthUserEntity();
@@ -110,6 +122,7 @@ public class UsersDbClient implements UsersClient {
   }
 
   @Override
+  @Step("Удалить пользователя: {user.username}")
   public void delete(UserJson user) {
     xaTemplate.execute(() -> {
       authUserRepository.findById(user.id()).ifPresent(authUserRepository::delete);

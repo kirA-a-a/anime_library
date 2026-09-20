@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
@@ -46,7 +47,7 @@ public class MuseumEntity {
   @JoinColumn(name = "country_id", nullable = false)
   private CountryEntity country;
 
-  public static MuseumEntity fromJson(MuseumJson json) {
+  public static @Nonnull MuseumEntity fromJson(MuseumJson json) {
     MuseumEntity entity = new MuseumEntity();
     entity.setId(json.id());
     entity.setTitle(json.title());

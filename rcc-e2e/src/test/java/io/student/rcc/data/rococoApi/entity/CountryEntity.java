@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.Objects;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.proxy.HibernateProxy;
@@ -27,7 +28,7 @@ public class CountryEntity {
   @Column(name = "name", nullable = false, unique = true, length = 255)
   private String name;
 
-  public static CountryEntity fromJson(CountryJson json) {
+  public static @Nonnull CountryEntity fromJson(CountryJson json) {
     CountryEntity entity = new CountryEntity();
     entity.setId(json.id());
     entity.setName(json.name());

@@ -1,4 +1,4 @@
-package io.student.rcc.test.ui;
+package io.student.rcc.test.jdbc;
 
 import static io.student.rcc.utils.RandomUserDataUtils.randomUserName;
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -3,17 +3,21 @@ package io.student.rcc.model;
 import io.student.rcc.data.rococoApi.entity.PaintingEntity;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public record PaintingJson(
-    UUID id,
+    @Nullable UUID id,
     String title,
     String description,
-    String content,
-    UUID artistId,
-    UUID museumId
+    @Nullable String content,
+    @Nullable UUID artistId,
+    @Nullable UUID museumId
 ) {
 
-  public static PaintingJson fromEntity(PaintingEntity entity) {
+  public static @Nonnull PaintingJson fromEntity(@Nonnull PaintingEntity entity) {
     return new PaintingJson(
         entity.getId(),
         entity.getTitle(),

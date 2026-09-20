@@ -9,7 +9,10 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public class DataSources {
 
   private static final Config CFG = Config.getInstance();
@@ -18,7 +21,7 @@ public class DataSources {
   private DataSources() {
   }
 
-  public static DataSource dataSource(String jdbcUrl) {
+  public static @Nonnull DataSource dataSource(String jdbcUrl) {
     return dataSources.computeIfAbsent(jdbcUrl, key -> {
       AtomikosDataSourceBean dsBean = new AtomikosDataSourceBean();
       final String uniqId = StringUtils.substringAfter(key, "3306/").split("\\?")[0];

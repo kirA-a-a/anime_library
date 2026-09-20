@@ -6,7 +6,10 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Path;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public interface GhApi {
 
   @GET("repos/kirA-a-a/anime_library/issues/{issue_number}")
@@ -14,6 +17,7 @@ public interface GhApi {
       "Accept: application/vnd.github+json",
       "X-GitHub-Api-Version: 2022-11-28"
   })
+  @Nonnull
   Call<JsonNode> issue(@Header("Authorization") String bearerToken,
       @Path("issue_number") String issueNumber);
 

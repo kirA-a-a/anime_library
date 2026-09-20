@@ -10,6 +10,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.util.Objects;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -40,7 +41,7 @@ public class UserEntity {
   @Column(name = "avatar", columnDefinition = "LONGBLOB")
   private String avatar;
 
-  public static UserEntity fromJson(UserJson json) {
+  public static @Nonnull UserEntity fromJson(UserJson json) {
     UserEntity entity = new UserEntity();
     entity.setId(json.id());
     entity.setUsername(json.username());
