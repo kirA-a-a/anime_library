@@ -12,7 +12,13 @@ def selenideVersion = '7.13.0'
 def fakerVersion = '1.0.2'
 def springJdbcVersion = '6.2.12'
 def mySqlConnectorVersion = '8.0.33'
+def atomikosVersion = '6.0.0'
+def p6spyVersion = '3.9.1'
+def hibernateVersion = '6.6.0.Final'
 def snakeYamlVersion = '1.33'
+def simpleJndiVersion = '0.24.0'
+def springDataCommonsVersion = '3.5.1'
+def jakartaPersistenceVersion = '3.2.0'
 
 configurations {
     agent {
@@ -24,6 +30,7 @@ configurations {
 configurations.configureEach {
     resolutionStrategy {
         force 'org.yaml:snakeyaml:1.33'
+        force 'org.hibernate.orm:hibernate-core:6.6.0.Final'
     }
 }
 
@@ -35,6 +42,7 @@ dependencies {
     testImplementation platform("io.qameta.allure:allure-bom:$allureVersion")
     testImplementation "io.qameta.allure:allure-junit5"
     agent "org.aspectj:aspectjweaver:$aspectJVersion"
+    testImplementation "io.qameta.allure:allure-selenide"
 
     // JUnit
     testImplementation platform("org.junit:junit-bom:$junitVersion")
@@ -43,13 +51,34 @@ dependencies {
     // Utils
     testImplementation "com.github.javafaker:javafaker:${fakerVersion}"
     testImplementation "org.yaml:snakeyaml:${snakeYamlVersion}"
+    testImplementation "com.github.h-thurow:simple-jndi:${simpleJndiVersion}"
+    testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
 
     // DB
     testImplementation "org.springframework:spring-jdbc:${springJdbcVersion}"
     testImplementation "mysql:mysql-connector-java:${mySqlConnectorVersion}"
+    testImplementation "com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11"
+    testImplementation "org.springframework.data:spring-data-commons:${springDataCommonsVersion}"
+
+    // XA / JTA (Atomikos)
+    testImplementation "com.atomikos:transactions-jta:${atomikosVersion}:jakarta"
+    testImplementation "com.atomikos:transactions-hibernate4:${atomikosVersion}:jakarta"
+    testImplementation "com.atomikos:transactions-jdbc:${atomikosVersion}"
+    testImplementation "p6spy:p6spy:${p6spyVersion}"
+    testImplementation "org.hibernate.orm:hibernate-core:${hibernateVersion}"
+    testImplementation "jakarta.persistence:jakarta.persistence-api:${jakartaPersistenceVersion}"
 
     // Security
     testImplementation("org.springframework.security:spring-security-crypto")
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-jackson:2.11.0'
+
+
+    // Lombok
+    testCompileOnly 'org.projectlombok:lombok:1.18.36'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 }
 
 allure {

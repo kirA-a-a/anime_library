@@ -1,12 +1,12 @@
 package io.student.rcc.test.ui;
 
-import static io.student.rcc.utils.RandomUserDataUtils.getRandomUserName;
+import static io.student.rcc.utils.RandomUserDataUtils.randomUserName;
 
 import com.codeborne.selenide.Selenide;
 import io.student.rcc.config.Config;
 import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.model.UserJson;
-import io.student.rcc.page.MainPage;
+import io.student.rcc.page.BasePage;
 import org.junit.jupiter.api.Test;
 
 public class RegistrationTest {
@@ -17,9 +17,9 @@ public class RegistrationTest {
   @Test
   public void mainPageShouldBeDisplayedAfterSuccessLogin() {
     final String TITLE = "Ваши любимые картины и художники всегда рядом";
-    String userName = getRandomUserName();
+    String userName = randomUserName();
 
-    Selenide.open(CFG.frontUrl(), MainPage.class)
+    Selenide.open(CFG.frontUrl(), BasePage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .successRegistrationUser(userName, PASSWORD)
@@ -33,7 +33,7 @@ public class RegistrationTest {
   @Test
   @User
   public void shouldNotRegisterUserWithExistingUsername(UserJson user) {
-    Selenide.open(CFG.frontUrl(), MainPage.class)
+    Selenide.open(CFG.frontUrl(), BasePage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .unSuccessRegister(user.username(), PASSWORD);
@@ -42,16 +42,16 @@ public class RegistrationTest {
   @Test
   @User
   public void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual(UserJson user) {
-    Selenide.open(CFG.frontUrl(), MainPage.class)
+    Selenide.open(CFG.frontUrl(), BasePage.class)
         .clickLoginButton()
         .incorrectLogin(user.username(), PASSWORD + "12345");
   }
 
   @Test
   public void shouldRegisterNewUser() {
-    String userName = getRandomUserName();
+    String userName = randomUserName();
 
-    Selenide.open(CFG.frontUrl(), MainPage.class)
+    Selenide.open(CFG.frontUrl(), BasePage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .successRegistrationUser(userName, PASSWORD)
@@ -62,7 +62,7 @@ public class RegistrationTest {
   @User
   public void userShouldStayOnLoginPageAfterLoginWithBadCredentials(UserJson user) {
 
-    Selenide.open(CFG.frontUrl(), MainPage.class)
+    Selenide.open(CFG.frontUrl(), BasePage.class)
         .clickLoginButton()
         .incorrectLogin(user.username() + "Test", PASSWORD);
   }
