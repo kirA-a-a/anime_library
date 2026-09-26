@@ -91,6 +91,7 @@ public class UsersDbClient implements UsersClient {
     return createUser(username, password, Authority.read, Authority.write);
   }
 
+  @Override
   @Step("Создать пользователя в БД: {username} с правами {authorities}")
   public @Nonnull UUID createUser(String username, String password, @Nullable Authority... authorities) {
     return xaTemplate.execute(() -> {

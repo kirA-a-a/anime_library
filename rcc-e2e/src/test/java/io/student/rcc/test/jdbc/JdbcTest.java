@@ -11,12 +11,14 @@ import io.student.rcc.data.rococoAuth.entity.AuthAuthorityEntity;
 import io.student.rcc.data.rococoAuth.entity.Authority;
 import io.student.rcc.data.rococoAuth.entity.AuthUserEntity;
 import io.student.rcc.data.rococoAuth.repository.iml.AuthUserRepositoryHibernate;
-import io.student.rcc.service.UsersDbClient;
+import io.student.rcc.jupiter.extension.UsersClientExtension;
+import io.student.rcc.service.UsersClient;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,11 +26,12 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@ExtendWith(UsersClientExtension.class)
 public class JdbcTest {
 
   private static final Config CFG = Config.getInstance();
   private static final String PASSWORD = "12345";
-  private final UsersDbClient usersDbClient = new UsersDbClient();
+  private UsersClient usersClient;
   private final AuthUserRepositoryHibernate authUserRepository = new AuthUserRepositoryHibernate();
   private final PasswordEncoder passwordEncoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
   private final JdbcTemplate jdbcTemplateAuth = new JdbcTemplate(
@@ -52,7 +55,7 @@ public class JdbcTest {
   void shouldCreateUserInAuthDatabase() {
     String username = randomUserName();
 
-    UUID id = usersDbClient.createUser(username, PASSWORD);
+    UUID id = usersClient.createUser(username, PASSWORD);
 
     AuthUserRow user = findUser(id);
     assertNotNull(id);
@@ -71,7 +74,7 @@ public class JdbcTest {
   void shouldCreateUserWithAuthorityInAuthDatabase(Authority authority) {
     String username = randomUserName();
 
-    UUID id = usersDbClient.createUser(username, PASSWORD, authority);
+    UUID id = usersClient.createUser(username, PASSWORD, authority);
 
     AuthUserRow user = findUser(id);
     assertNotNull(id);
@@ -84,7 +87,7 @@ public class JdbcTest {
   void shouldCreateUserWithAllAuthorities() {
     String username = randomUserName();
 
-    UUID id = usersDbClient.createUser(username, PASSWORD, Authority.read, Authority.write);
+    UUID id = usersClient.createUser(username, PASSWORD, Authority.read, Authority.write);
 
     AuthUserRow user = findUser(id);
     assertNotNull(id);
@@ -103,7 +106,7 @@ public class JdbcTest {
   @Test
   void findAllShouldReturnSingleUserObjectForJoinedAuthorities() {
     String username = randomUserName();
-    UUID id = usersDbClient.createUser(username, PASSWORD, Authority.read, Authority.write);
+    UUID id = usersClient.createUser(username, PASSWORD, Authority.read, Authority.write);
 
     List<AuthUserEntity> matched = authUserRepository.findAll().stream()
         .filter(user -> id.equals(user.getId()))
@@ -146,7 +149,7 @@ public class JdbcTest {
 
     try {
       assertThrows(RuntimeException.class, () ->
-          usersDbClient.createUser(username, PASSWORD, Authority.read)
+          usersClient.createUser(username, PASSWORD, Authority.read)
       );
 
       assertEquals(0, countAuthUsers(username));

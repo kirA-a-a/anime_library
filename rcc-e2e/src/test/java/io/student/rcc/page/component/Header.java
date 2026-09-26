@@ -11,7 +11,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class Header extends BaseComponent {
+public class Header extends BaseComponent<Header> {
 
   public Header() {
     super($(".app-bar"));

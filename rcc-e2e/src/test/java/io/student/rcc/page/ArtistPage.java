@@ -4,6 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class ArtistPage {
+public class ArtistPage extends BasePage<ArtistPage> {
 
 }

@@ -14,7 +14,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class ProfilePage {
+public class ProfilePage extends BasePage<ProfilePage>{
 
   private final SelenideElement form = $("form.modal-form"),
       firstnameInput = $("input[name='firstname']"),

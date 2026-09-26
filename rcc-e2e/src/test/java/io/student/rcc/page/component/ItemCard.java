@@ -11,7 +11,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class ItemCard extends BaseComponent {
+public class ItemCard extends BaseComponent<ItemCard> {
 
   public ItemCard(SelenideElement self) {
     super(self);

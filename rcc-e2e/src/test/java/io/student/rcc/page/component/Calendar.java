@@ -5,7 +5,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class Calendar extends BaseComponent {
+public class Calendar extends BaseComponent<Calendar> {
 
   public Calendar(SelenideElement self) {
     super(self);

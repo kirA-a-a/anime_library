@@ -29,7 +29,9 @@ public interface Config {
   String dbPassword();
 
   @Nonnull
-  String ghUrl();
+  default String ghUrl(){
+    return "https://api.github.com/";
+  };
 
   @Nonnull
   String authUrl();

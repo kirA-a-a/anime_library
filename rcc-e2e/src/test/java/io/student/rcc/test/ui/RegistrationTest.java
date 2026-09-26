@@ -6,7 +6,7 @@ import com.codeborne.selenide.Selenide;
 import io.student.rcc.config.Config;
 import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.model.UserJson;
-import io.student.rcc.page.BasePage;
+import io.student.rcc.page.MainPage;
 import org.junit.jupiter.api.Test;
 
 public class RegistrationTest {
@@ -19,7 +19,7 @@ public class RegistrationTest {
     final String TITLE = "Ваши любимые картины и художники всегда рядом";
     String userName = randomUserName();
 
-    Selenide.open(CFG.frontUrl(), BasePage.class)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .successRegistrationUser(userName, PASSWORD)
@@ -33,7 +33,7 @@ public class RegistrationTest {
   @Test
   @User
   public void shouldNotRegisterUserWithExistingUsername(UserJson user) {
-    Selenide.open(CFG.frontUrl(), BasePage.class)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .unSuccessRegister(user.username(), PASSWORD);
@@ -42,7 +42,7 @@ public class RegistrationTest {
   @Test
   @User
   public void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual(UserJson user) {
-    Selenide.open(CFG.frontUrl(), BasePage.class)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .incorrectLogin(user.username(), PASSWORD + "12345");
   }
@@ -51,7 +51,7 @@ public class RegistrationTest {
   public void shouldRegisterNewUser() {
     String userName = randomUserName();
 
-    Selenide.open(CFG.frontUrl(), BasePage.class)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .successRegistrationUser(userName, PASSWORD)
@@ -62,7 +62,7 @@ public class RegistrationTest {
   @User
   public void userShouldStayOnLoginPageAfterLoginWithBadCredentials(UserJson user) {
 
-    Selenide.open(CFG.frontUrl(), BasePage.class)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .incorrectLogin(user.username() + "Test", PASSWORD);
   }

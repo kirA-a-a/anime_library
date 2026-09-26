@@ -12,7 +12,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class Toast extends BaseComponent {
+public class Toast extends BaseComponent<Toast> {
 
   public Toast(SelenideElement self) {
     super(self);

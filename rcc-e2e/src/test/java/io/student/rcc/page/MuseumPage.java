@@ -20,7 +20,7 @@ import org.openqa.selenium.Keys;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class MuseumPage {
+public class MuseumPage extends BasePage<MuseumPage>{
 
   private static final Config CFG = Config.getInstance();
   public static final String URL = CFG.frontUrl() + "museum";

@@ -6,7 +6,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class SearchField extends BaseComponent {
+public class SearchField extends BaseComponent<SearchField> {
 
   public SearchField() {
     super($("input[type=search]"));

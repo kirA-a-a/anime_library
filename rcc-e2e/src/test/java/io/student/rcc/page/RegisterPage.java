@@ -11,7 +11,7 @@ import org.openqa.selenium.By;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class RegisterPage {
+public class RegisterPage extends BasePage<RegisterPage>{
 
   private final SelenideElement userNameInput = $("input[id='username']"),
       passwordInput = $("input[id='password']"),
@@ -21,13 +21,13 @@ public class RegisterPage {
       userNameMessageError = $("span[class*='error__username')]");
 
   @Step("Зарегистрировать пользователя: {userName}")
-  public @Nonnull BasePage successRegistrationUser(String userName, String password) {
+  public @Nonnull MainPage successRegistrationUser(String userName, String password) {
     userNameInput.setValue(userName);
     passwordInput.setValue(password);
     passwordSubmitInput.setValue(password);
     submitBtn.click();
     signInBtn.shouldBe(visible).click();
-    return new BasePage();
+    return new MainPage();
   }
 
   @Step("Зарегистрировать существующего пользователя: {userName}")

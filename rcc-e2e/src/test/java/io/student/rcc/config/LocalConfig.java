@@ -33,11 +33,6 @@ public enum LocalConfig implements Config {
   }
 
   @Override
-  public @Nonnull String ghUrl() {
-    return "https://api.github.com/";
-  }
-
-  @Override
   public @Nonnull String authUrl() {
     return "http://localhost:9000/";
   }

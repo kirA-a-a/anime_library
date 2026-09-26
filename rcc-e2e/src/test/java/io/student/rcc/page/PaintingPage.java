@@ -4,6 +4,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class PaintingPage {
+public class PaintingPage extends BasePage<PaintingPage>{
 
 }

@@ -11,7 +11,7 @@ import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.jupiter.annotation.meta.WebTest;
 import io.student.rcc.model.MuseumJson;
 import io.student.rcc.model.UserJson;
-import io.student.rcc.page.BasePage;
+import io.student.rcc.page.MainPage;
 import io.student.rcc.page.MuseumPage;
 import io.student.rcc.page.component.Header;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +33,7 @@ public class MuseumWebTest {
     String firstname = randomName();
     String lastname = randomName();
 
-    BasePage.open()
+    MainPage.open()
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .clickInProfile()
@@ -49,7 +49,7 @@ public class MuseumWebTest {
     String city = randomCity();
     String description = randomSentence(8);
 
-    BasePage.open()
+    MainPage.open()
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .toMuseums()
@@ -70,7 +70,7 @@ public class MuseumWebTest {
     String newCity = randomCity();
     String newDescription = randomSentence(8);
 
-    BasePage.open()
+    MainPage.open()
         .clickLoginButton()
         .login(user.username(), PASSWORD);
 
@@ -96,7 +96,7 @@ public class MuseumWebTest {
       String expectedError,
       UserJson user
   ) {
-    BasePage.open()
+    MainPage.open()
         .clickLoginButton()
         .login(user.username(), PASSWORD);
 

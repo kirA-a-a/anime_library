@@ -3,6 +3,7 @@ package io.student.rcc.page;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import io.student.rcc.config.Config;
@@ -12,7 +13,7 @@ import org.openqa.selenium.By;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class AuthenticationPage {
+public class AuthenticationPage extends BasePage<AuthenticationPage> {
 
   public static String url = Config.getInstance().frontUrl() + "/autificationPage";
   private final SelenideElement userNameInput = $("input[name='username']"),
@@ -23,12 +24,12 @@ public class AuthenticationPage {
       incorrectDataError = $(By.xpath("//p[class*='login__error']"));
 
   @Step("Авторизоваться под пользователем: {username}")
-  public @Nonnull BasePage login(String username, String password) {
+  public @Nonnull MainPage login(String username, String password) {
     userNameInput.setValue(username);
     passwordInput.setValue(password);
     submitBtn.click();
     avatar.shouldBe(visible);
-    return new BasePage();
+    return new MainPage();
   }
 
   @Step("Авторизоваться с невалидными данными: {username}")
