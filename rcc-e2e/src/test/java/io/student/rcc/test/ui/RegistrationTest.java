@@ -1,6 +1,6 @@
 package io.student.rcc.test.ui;
 
-import static io.student.rcc.utils.RandomUserDataUtils.getRandomUserName;
+import static io.student.rcc.utils.RandomUserDataUtils.randomUserName;
 
 import com.codeborne.selenide.Selenide;
 import io.student.rcc.config.Config;
@@ -17,7 +17,7 @@ public class RegistrationTest {
   @Test
   public void mainPageShouldBeDisplayedAfterSuccessLogin() {
     final String TITLE = "Ваши любимые картины и художники всегда рядом";
-    String userName = getRandomUserName();
+    String userName = randomUserName();
 
     Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
@@ -49,7 +49,7 @@ public class RegistrationTest {
 
   @Test
   public void shouldRegisterNewUser() {
-    String userName = getRandomUserName();
+    String userName = randomUserName();
 
     Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
