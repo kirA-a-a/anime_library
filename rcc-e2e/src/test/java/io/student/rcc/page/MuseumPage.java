@@ -1,5 +1,6 @@
 package io.student.rcc.page;
 
+import static com.codeborne.selenide.Condition.attributeMatching;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
@@ -11,10 +12,16 @@ import io.student.rcc.config.Config;
 import io.student.rcc.page.component.Header;
 import io.student.rcc.page.component.ItemCard;
 import io.student.rcc.page.component.Toast;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.Duration;
+import java.util.Base64;
+import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.imageio.ImageIO;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 
@@ -39,7 +46,8 @@ public class MuseumPage extends BasePage<MuseumPage>{
       museumCard = $("article.card"),
       museumTitle = museumCard.$("header.card-header"),
       museumLocation = museumCard.$("header.card-header + div"),
-      museumDescription = museumCard.$("div.w-56 + div");
+      museumDescription = museumCard.$("div.w-56 + div"),
+      museumPhoto = $("img.my-4");
 
   @Step("Открыть страницу музея: {museumId}")
   public static @Nonnull MuseumPage open(UUID museumId) {
@@ -156,6 +164,37 @@ public class MuseumPage extends BasePage<MuseumPage>{
   public @Nonnull MuseumPage checkMuseumCard(String title) {
     ItemCard.byTitle(title).shouldBeVisible().shouldHaveTitle(title);
     return this;
+  }
+
+  @Step("Дождаться загрузки фото музея на странице деталей")
+  public @Nonnull MuseumPage waitForMuseumPhotoLoaded() {
+    museumPhoto.shouldBe(visible, Duration.ofSeconds(10));
+    museumPhoto.shouldHave(attributeMatching("src", "data:image/.*"), Duration.ofSeconds(10));
+    Selenide.executeJavaScript(
+        """
+            const img = arguments[0];
+            if (!img.complete || img.naturalWidth === 0) {
+              return new Promise((resolve) => {
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                setTimeout(() => resolve(false), 10000);
+              });
+            }
+            return true;
+            """,
+        museumPhoto
+    );
+    return this;
+  }
+
+  @Step("Сделать скриншот фото музея")
+  public @Nonnull BufferedImage takeMuseumPhotoScreenshot() throws IOException {
+    museumPhoto.shouldBe(visible, Duration.ofSeconds(10));
+    museumPhoto.shouldHave(attributeMatching("src", "data:image/.*"), Duration.ofSeconds(10));
+
+    String src = Objects.requireNonNull(museumPhoto.getAttribute("src"));
+    byte[] bytes = Base64.getDecoder().decode(src.substring(src.indexOf(',') + 1));
+    return ImageIO.read(new ByteArrayInputStream(bytes));
   }
 
   private static void type(SelenideElement element, String value) {
