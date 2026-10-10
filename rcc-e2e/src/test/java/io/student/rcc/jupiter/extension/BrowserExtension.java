@@ -14,7 +14,6 @@ import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 
-
 public class BrowserExtension implements BeforeEachCallback, AfterEachCallback,
     TestExecutionExceptionHandler, LifecycleMethodExecutionExceptionHandler {
 
@@ -29,7 +28,7 @@ public class BrowserExtension implements BeforeEachCallback, AfterEachCallback,
   public void beforeEach(ExtensionContext context) throws Exception {
     SelenideLogger.addListener("Allure-selenide", new AllureSelenide()
         .savePageSource(false)
-        .screenshots(false)
+        .screenshots(true)
     );
   }
 

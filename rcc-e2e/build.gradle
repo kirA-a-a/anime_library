@@ -56,6 +56,7 @@ dependencies {
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'org.jsoup:jsoup:1.18.3'
     testImplementation 'org.awaitility:awaitility:4.3.0'
+    testImplementation "ru.yandex.qatools.ashot:ashot:1.5.4"
 
     // DB
     testImplementation "org.springframework:spring-jdbc:${springJdbcVersion}"
@@ -84,6 +85,8 @@ dependencies {
     // Lombok
     testCompileOnly 'org.projectlombok:lombok:1.18.36'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
+
+    allureRawResultElements(files(layout.buildDirectory.dir("allure-results")))
 }
 
 allure {
@@ -92,5 +95,8 @@ allure {
 
 test {
     useJUnitPlatform()
+    workingDir = rootProject.projectDir
+    systemProperty "allure.results.directory",
+        layout.buildDirectory.dir("allure-results").get().asFile.absolutePath
     jvmArgs = ["-javaagent:${configurations.agent.singleFile}"]
 }
