@@ -2,6 +2,7 @@ package io.student.rcc.api;
 
 import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
 
+import io.qameta.allure.okhttp3.AllureOkHttp3;
 import io.student.rcc.api.core.ThreadSafeCookieStore;
 import io.student.rcc.config.Config;
 import java.net.CookieManager;
@@ -62,6 +63,7 @@ public abstract class BaseRestClient {
             )
         )
     );
+    builder.addNetworkInterceptor(new AllureOkHttp3());
 
     this.okHttpClient = builder.build();
     this.retrofit = new Retrofit.Builder()
