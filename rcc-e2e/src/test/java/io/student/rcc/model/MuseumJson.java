@@ -17,7 +17,7 @@ public record MuseumJson(
     @Nullable UUID countryId
 ) {
 
-  public static @Nonnull MuseumJson fromEntity(@Nonnull MuseumEntity entity) {
+  public static @Nonnull MuseumJson fromEntity(MuseumEntity entity) {
     return new MuseumJson(
         entity.getId(),
         entity.getTitle(),

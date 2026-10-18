@@ -8,7 +8,8 @@
         const t: ToastSettings = {
             message: message,
             background: 'variant-filled-error',
-            classes: "break-all",
+            // Skeleton Toast already has data-testid="toast"; class marks type for e2e
+            classes: "break-all toast-error",
         };
         toastStore.trigger(t);
     }
@@ -17,7 +18,7 @@
         const t: ToastSettings = {
             message: message,
             background: 'variant-filled-primary',
-            classes: "break-all",
+            classes: "break-all toast-success",
         };
         toastStore.trigger(t);
     }

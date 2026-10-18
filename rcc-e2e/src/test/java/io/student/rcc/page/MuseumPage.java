@@ -1,10 +1,13 @@
 package io.student.rcc.page;
 
+import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.attributeMatching;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
 
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
@@ -32,6 +35,7 @@ public class MuseumPage extends BasePage<MuseumPage>{
   private static final Config CFG = Config.getInstance();
   public static final String URL = CFG.frontUrl() + "museum";
   private final Header header = new Header();
+  private final ElementsCollection museumListCards = $$("[data-testid='museum-card']");
   private final SelenideElement
       pageTitle = $("h2"),
       addMuseumButton = $(By.xpath("//button[text()='Добавить музей']")),
@@ -49,9 +53,23 @@ public class MuseumPage extends BasePage<MuseumPage>{
       museumDescription = museumCard.$("div.w-56 + div"),
       museumPhoto = $("img.my-4");
 
-  @Step("Открыть страницу музея: {museumId}")
+  @Step("Открыть список музеев")
+  public static @Nonnull MuseumPage open() {
+    return Selenide.open(URL, MuseumPage.class);
+  }
+
+  @Step("Открыть страницу музея кликом по карточке: {museumId}")
   public static @Nonnull MuseumPage open(UUID museumId) {
-    return Selenide.open(URL + "/" + museumId, MuseumPage.class);
+    return open().openMuseumById(museumId);
+  }
+
+  @Step("Открыть музей кликом по карточке: {museumId}")
+  public @Nonnull MuseumPage openMuseumById(UUID museumId) {
+    museumListCards
+        .findBy(attribute("data-museum-id", museumId.toString()))
+        .shouldBe(visible, Duration.ofSeconds(10))
+        .click();
+    return this;
   }
 
   @Step("Проверить заголовок страницы музеев")

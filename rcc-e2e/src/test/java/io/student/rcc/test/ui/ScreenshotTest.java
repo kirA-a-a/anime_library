@@ -55,7 +55,7 @@ public class ScreenshotTest {
         .waitForAvatarLoaded();
 
     BufferedImage actual = new ProfilePage().takeAvatarScreenshot();
-    assertFalse(new ScreenDiffResult(expected, actual));
+    assertFalse(new ScreenDiffResult(expected, actual), "Screen comparison failure");
   }
 
   @User(
@@ -67,9 +67,9 @@ public class ScreenshotTest {
 
     MainPage.open()
         .clickLoginButton()
-        .login(user.username(), PASSWORD);
-
-    MuseumPage.open(museum.id())
+        .login(user.username(), PASSWORD)
+        .toMuseums()
+        .openMuseumById(museum.id())
         .openEditMuseumForm()
         .uploadPhoto(MUSEUM_PHOTO)
         .submitForm()
@@ -77,7 +77,7 @@ public class ScreenshotTest {
         .waitForMuseumPhotoLoaded();
 
     BufferedImage actual = new MuseumPage().takeMuseumPhotoScreenshot();
-    assertFalse(new ScreenDiffResult(expected, actual));
+    assertFalse(new ScreenDiffResult(expected, actual), "Screen comparison failure");
   }
 
 }

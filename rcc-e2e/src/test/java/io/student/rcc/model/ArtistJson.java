@@ -15,7 +15,7 @@ public record ArtistJson(
     @Nullable String photo
 ) {
 
-  public static @Nonnull ArtistJson fromEntity(@Nonnull ArtistEntity entity) {
+  public static @Nonnull ArtistJson fromEntity(ArtistEntity entity) {
     return new ArtistJson(
         entity.getId(),
         entity.getName(),

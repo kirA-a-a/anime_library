@@ -60,8 +60,10 @@
 
 {#if $modalStore[0]}
 	<FormWrapper modalTitle="Редактировать художника" modalBody="">
-		<form class="modal-form space-y-4" on:submit={onSubmit} enctype="multipart/form-data">
-			<Avatar src={photo} width="w-48" rounded="rounded-full" class="mx-auto" />
+		<form class="modal-form space-y-4" data-testid="artist-form" on:submit={onSubmit} enctype="multipart/form-data">
+			<div data-testid="artist-form-preview">
+				<Avatar src={photo} width="w-48" rounded="rounded-full" class="mx-auto" />
+			</div>
 			<ImageInput
 				label="Обновить изображение художника"
 				name="photo"

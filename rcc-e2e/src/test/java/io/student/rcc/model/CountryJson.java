@@ -12,7 +12,7 @@ public record CountryJson(
     String name
 ) {
 
-  public static @Nonnull CountryJson fromEntity(@Nonnull CountryEntity entity) {
+  public static @Nonnull CountryJson fromEntity(CountryEntity entity) {
     return new CountryJson(
         entity.getId(),
         entity.getName()

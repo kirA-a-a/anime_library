@@ -15,7 +15,7 @@ public record UserJson(
     @Nullable String avatar
 ) {
 
-  public static @Nonnull UserJson fromEntity(@Nonnull UserEntity entity) {
+  public static @Nonnull UserJson fromEntity(UserEntity entity) {
     return new UserJson(
         entity.getId(),
         entity.getUsername(),

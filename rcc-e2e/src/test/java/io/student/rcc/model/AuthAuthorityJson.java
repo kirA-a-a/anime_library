@@ -13,7 +13,7 @@ public record AuthAuthorityJson(
     Authority authority
 ) {
 
-  public static @Nonnull AuthAuthorityJson fromEntity(@Nonnull AuthAuthorityEntity entity) {
+  public static @Nonnull AuthAuthorityJson fromEntity(AuthAuthorityEntity entity) {
     return new AuthAuthorityJson(
         entity.getUser() != null ? entity.getUser().getId() : null,
         entity.getAuthority()

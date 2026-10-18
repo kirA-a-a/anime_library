@@ -15,6 +15,7 @@
     export let successTrigger: (message: string) => void;
     export let store: Writable<StoreDataType<Type>>;
     export let addButtonName: string;
+    export let addButtonTestId: string;
     export let pageTitle: string;
     export let searchPlaceholder: string;
     export let formComponent: ComponentType;
@@ -148,6 +149,7 @@
         title={pageTitle}
         searchPlaceholder={searchPlaceholder}
         addButtonName={addButtonName}
+        {addButtonTestId}
         onAddButtonClick={clickAddButton}
         loadFunction={loadSearch}
 />

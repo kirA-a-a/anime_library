@@ -17,7 +17,7 @@ public record AuthUserJson(
     boolean credentialsNonExpired
 ) {
 
-  public static @Nonnull AuthUserJson fromEntity(@Nonnull AuthUserEntity entity) {
+  public static @Nonnull AuthUserJson fromEntity(AuthUserEntity entity) {
     return new AuthUserJson(
         entity.getId(),
         entity.getUsername(),

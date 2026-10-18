@@ -4,12 +4,14 @@ import static io.student.rcc.utils.RandomUserDataUtils.randomCity;
 import static io.student.rcc.utils.RandomUserDataUtils.randomMuseumTitle;
 import static io.student.rcc.utils.RandomUserDataUtils.randomSentence;
 
+import io.student.rcc.jupiter.annotation.Museum;
 import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.model.CountryJson;
 import io.student.rcc.model.MuseumJson;
 import io.student.rcc.service.MuseumsClient;
 import io.student.rcc.service.MuseumsDbClient;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -29,38 +31,48 @@ public class MuseumExtension implements BeforeEachCallback, AfterEachCallback, P
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
-        .ifPresent(userAnnotation ->
-            Arrays.stream(userAnnotation.museums()).findFirst().ifPresent(museumAnnotation -> {
-              CountryJson country = context.getStore(CountryExtension.NAMESPACE)
-                  .get(context.getUniqueId(), CountryJson.class);
+    Optional<User> userAnnotation = AnnotationSupport.findAnnotation(
+        context.getRequiredTestMethod(), User.class);
+    if (userAnnotation.isEmpty()) {
+      return;
+    }
 
-              MuseumJson museum = client.create(new MuseumJson(
-                  null,
-                  museumAnnotation.title().isEmpty()
-                      ? randomMuseumTitle()
-                      : museumAnnotation.title(),
-                  museumAnnotation.description().isEmpty()
-                      ? randomSentence(8)
-                      : museumAnnotation.description(),
-                  museumAnnotation.city().isEmpty()
-                      ? randomCity()
-                      : museumAnnotation.city(),
-                  museumAnnotation.content().isEmpty()
-                      ? DEFAULT_PHOTO
-                      : museumAnnotation.content(),
-                  country.id()
-              ));
-              context.getStore(NAMESPACE).put(context.getUniqueId(), museum);
+    Optional<Museum> museumAnnotation = Arrays.stream(userAnnotation.get().museums()).findFirst();
+    if (museumAnnotation.isEmpty()) {
+      return;
+    }
 
-              TestData testData = context.getStore(TestData.NAMESPACE)
-                  .get(context.getUniqueId(), TestData.class);
-              context.getStore(TestData.NAMESPACE).put(
-                  context.getUniqueId(),
-                  testData.withMuseum(museum)
-              );
-            })
-        );
+    CountryJson country = context.getStore(CountryExtension.NAMESPACE)
+        .get(context.getUniqueId(), CountryJson.class);
+
+    MuseumJson museum = client.create(new MuseumJson(
+        null,
+        museumAnnotation.get().title().isEmpty()
+            ? randomMuseumTitle()
+            : museumAnnotation.get().title(),
+        museumAnnotation.get().description().isEmpty()
+            ? randomSentence(8)
+            : museumAnnotation.get().description(),
+        museumAnnotation.get().city().isEmpty()
+            ? randomCity()
+            : museumAnnotation.get().city(),
+        "data:image/png;base64," + Base64.getEncoder().encodeToString(
+            getClass().getClassLoader().getResourceAsStream(
+                museumAnnotation.get().content().isEmpty()
+                    ? DEFAULT_PHOTO
+                    : museumAnnotation.get().content()
+            ).readAllBytes()
+        ),
+        country.id()
+    ));
+    context.getStore(NAMESPACE).put(context.getUniqueId(), museum);
+
+    TestData testData = context.getStore(TestData.NAMESPACE)
+        .get(context.getUniqueId(), TestData.class);
+    context.getStore(TestData.NAMESPACE).put(
+        context.getUniqueId(),
+        testData.withMuseum(museum)
+    );
   }
 
   @Override

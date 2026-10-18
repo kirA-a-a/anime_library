@@ -12,7 +12,6 @@ import io.student.rcc.jupiter.annotation.meta.WebTest;
 import io.student.rcc.model.MuseumJson;
 import io.student.rcc.model.UserJson;
 import io.student.rcc.page.MainPage;
-import io.student.rcc.page.MuseumPage;
 import io.student.rcc.page.component.Header;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -72,9 +71,9 @@ public class MuseumWebTest {
 
     MainPage.open()
         .clickLoginButton()
-        .login(user.username(), PASSWORD);
-
-    MuseumPage.open(museum.id())
+        .login(user.username(), PASSWORD)
+        .toMuseums()
+        .openMuseumById(museum.id())
         .editMuseum(newTitle, COUNTRY, newCity, newDescription)
         .checkToast("Обновлен музей: " + newTitle)
         .checkMuseumDetails(newTitle, newCity, newDescription);

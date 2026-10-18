@@ -17,7 +17,7 @@ public record PaintingJson(
     @Nullable UUID museumId
 ) {
 
-  public static @Nonnull PaintingJson fromEntity(@Nonnull PaintingEntity entity) {
+  public static @Nonnull PaintingJson fromEntity(PaintingEntity entity) {
     return new PaintingJson(
         entity.getId(),
         entity.getTitle(),

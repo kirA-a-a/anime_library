@@ -1,11 +1,13 @@
 package io.student.rcc.jupiter.extension;
 
+import io.student.rcc.jupiter.annotation.Artist;
 import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.model.ArtistJson;
 import io.student.rcc.service.ArtistsClient;
 import io.student.rcc.service.ArtistsDbClient;
 import io.student.rcc.utils.RandomUserDataUtils;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -26,29 +28,37 @@ public class ArtistExtension implements BeforeEachCallback, AfterEachCallback, P
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
-        .ifPresent(userAnnotation ->
-            Arrays.stream(userAnnotation.artists()).findFirst().ifPresent(artistAnnotation -> {
-              ArtistJson artist = client.create(new ArtistJson(
-                  null,
-                  artistAnnotation.name().isEmpty()
-                      ? RandomUserDataUtils.randomArtistName()
-                      : artistAnnotation.name(),
-                  artistAnnotation.biography().isEmpty()
-                      ? RandomUserDataUtils.randomSentence(8)
-                      : artistAnnotation.biography(),
-                  DEFAULT_IMAGE_PATH
-              ));
-              context.getStore(NAMESPACE).put(context.getUniqueId(), artist);
+    Optional<User> userAnnotation = AnnotationSupport.findAnnotation(
+        context.getRequiredTestMethod(), User.class);
+    if (userAnnotation.isEmpty()) {
+      return;
+    }
 
-              TestData testData = context.getStore(TestData.NAMESPACE)
-                  .get(context.getUniqueId(), TestData.class);
-              context.getStore(TestData.NAMESPACE).put(
-                  context.getUniqueId(),
-                  testData.withArtist(artist)
-              );
-            })
-        );
+    Optional<Artist> artistAnnotation = Arrays.stream(userAnnotation.get().artists()).findFirst();
+    if (artistAnnotation.isEmpty()) {
+      return;
+    }
+
+    ArtistJson artist = client.create(new ArtistJson(
+        null,
+        artistAnnotation.get().name().isEmpty()
+            ? RandomUserDataUtils.randomArtistName()
+            : artistAnnotation.get().name(),
+        artistAnnotation.get().biography().isEmpty()
+            ? RandomUserDataUtils.randomSentence(8)
+            : artistAnnotation.get().biography(),
+        "data:image/png;base64," + Base64.getEncoder().encodeToString(
+            getClass().getClassLoader().getResourceAsStream(DEFAULT_IMAGE_PATH).readAllBytes()
+        )
+    ));
+    context.getStore(NAMESPACE).put(context.getUniqueId(), artist);
+
+    TestData testData = context.getStore(TestData.NAMESPACE)
+        .get(context.getUniqueId(), TestData.class);
+    context.getStore(TestData.NAMESPACE).put(
+        context.getUniqueId(),
+        testData.withArtist(artist)
+    );
   }
 
   @Override

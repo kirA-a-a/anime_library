@@ -67,15 +67,11 @@ public class ScreenShotTestExtension implements ParameterResolver, TestExecution
       }
     }
 
-    BufferedImage expected = getExpected();
-    BufferedImage actual = getActual();
-    BufferedImage dif = getDif();
-
-    if (expected != null && actual != null && dif != null) {
+    if (throwable.getMessage().contains("Screen comparison failure")) {
       ScreenDif screenDif = new ScreenDif(
-          "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(expected)),
-          "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(actual)),
-          "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(dif))
+          "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getExpected())),
+          "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getActual())),
+          "data:image/png;base64," + Base64.getEncoder().encodeToString(imageToBytes(getDif()))
       );
 
       Allure.addAttachment(

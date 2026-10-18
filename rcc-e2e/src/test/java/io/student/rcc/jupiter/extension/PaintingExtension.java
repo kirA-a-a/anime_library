@@ -2,6 +2,7 @@ package io.student.rcc.jupiter.extension;
 
 import static io.student.rcc.utils.RandomUserDataUtils.randomSentence;
 
+import io.student.rcc.jupiter.annotation.Painting;
 import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.model.ArtistJson;
 import io.student.rcc.model.MuseumJson;
@@ -10,6 +11,7 @@ import io.student.rcc.service.PaintingsClient;
 import io.student.rcc.service.PaintingsDbClient;
 import io.student.rcc.utils.RandomUserDataUtils;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
@@ -31,41 +33,52 @@ public class PaintingExtension implements BeforeEachCallback, AfterEachCallback,
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    AnnotationSupport.findAnnotation(context.getRequiredTestMethod(), User.class)
-        .ifPresent(userAnnotation ->
-            Arrays.stream(userAnnotation.paintings()).findFirst().ifPresent(paintingAnnotation -> {
-              ArtistJson artist = Objects.requireNonNull(
-                  context.getStore(ArtistExtension.NAMESPACE)
-                      .get(context.getUniqueId(), ArtistJson.class),
-                  "Artist is required for PaintingExtension"
-              );
-              MuseumJson museum = context.getStore(MuseumExtension.NAMESPACE)
-                  .get(context.getUniqueId(), MuseumJson.class);
+    Optional<User> userAnnotation = AnnotationSupport.findAnnotation(
+        context.getRequiredTestMethod(), User.class);
+    if (userAnnotation.isEmpty()) {
+      return;
+    }
 
-              PaintingJson painting = client.create(new PaintingJson(
-                  null,
-                  paintingAnnotation.title().isEmpty()
-                      ? RandomUserDataUtils.randomPaintingTitle()
-                      : paintingAnnotation.title(),
-                  paintingAnnotation.description().isEmpty()
-                      ? randomSentence(8)
-                      : paintingAnnotation.description(),
-                  paintingAnnotation.content().isEmpty()
-                      ? DEFAULT_CONTENT_PATH
-                      : paintingAnnotation.content(),
-                  artist.id(),
-                  museum != null ? museum.id() : null
-              ));
-              context.getStore(NAMESPACE).put(context.getUniqueId(), painting);
+    Optional<Painting> paintingAnnotation = Arrays.stream(userAnnotation.get().paintings())
+        .findFirst();
+    if (paintingAnnotation.isEmpty()) {
+      return;
+    }
 
-              TestData testData = context.getStore(TestData.NAMESPACE)
-                  .get(context.getUniqueId(), TestData.class);
-              context.getStore(TestData.NAMESPACE).put(
-                  context.getUniqueId(),
-                  testData.withPainting(painting)
-              );
-            })
-        );
+    ArtistJson artist = Objects.requireNonNull(
+        context.getStore(ArtistExtension.NAMESPACE)
+            .get(context.getUniqueId(), ArtistJson.class),
+        "Artist is required for PaintingExtension"
+    );
+    MuseumJson museum = context.getStore(MuseumExtension.NAMESPACE)
+        .get(context.getUniqueId(), MuseumJson.class);
+
+    PaintingJson painting = client.create(new PaintingJson(
+        null,
+        paintingAnnotation.get().title().isEmpty()
+            ? RandomUserDataUtils.randomPaintingTitle()
+            : paintingAnnotation.get().title(),
+        paintingAnnotation.get().description().isEmpty()
+            ? randomSentence(8)
+            : paintingAnnotation.get().description(),
+        "data:image/png;base64," + Base64.getEncoder().encodeToString(
+            getClass().getClassLoader().getResourceAsStream(
+                paintingAnnotation.get().content().isEmpty()
+                    ? DEFAULT_CONTENT_PATH
+                    : paintingAnnotation.get().content()
+            ).readAllBytes()
+        ),
+        artist.id(),
+        museum.id()
+    ));
+    context.getStore(NAMESPACE).put(context.getUniqueId(), painting);
+
+      TestData testData = context.getStore(TestData.NAMESPACE)
+          .get(context.getUniqueId(), TestData.class);
+      context.getStore(TestData.NAMESPACE).put(
+          context.getUniqueId(),
+          testData.withPainting(painting)
+      );
   }
 
   @Override
