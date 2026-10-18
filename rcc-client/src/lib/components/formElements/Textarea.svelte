@@ -9,10 +9,11 @@
 
 </script>
 
-<label class="label">
-    <span>{label}</span>
+<label class="label" data-testid={`field-${name}`}>
+    <span data-testid={`label-${name}`}>{label}</span>
     <textarea 
         {name}
+        data-testid={`input-${name}`}
         class="textarea" 
         class:input-error={error.length}
         rows="4" 
@@ -21,5 +22,5 @@
         {placeholder}
         {required}
          />
-    <span class="text-error-400">{error}</span>
+    <span class="text-error-400" data-testid={`input-error-${name}`}>{error}</span>
 </label>

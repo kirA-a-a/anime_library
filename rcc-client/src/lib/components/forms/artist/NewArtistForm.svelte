@@ -61,7 +61,7 @@
 		modalTitle="Новый художник"
 		modalBody="Заполните форму, чтобы добавить нового художника"
 	>
-		<form class="modal-form space-y-4" on:submit={onSubmit} enctype="multipart/form-data">
+		<form class="modal-form space-y-4" data-testid="artist-form" on:submit={onSubmit} enctype="multipart/form-data">
 			<Input
 				label="Имя"
 				name="name"

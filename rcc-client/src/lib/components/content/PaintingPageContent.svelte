@@ -24,14 +24,14 @@
 
 </script>
 
-<article class="card m-8 p-4 min-h-[90%]">
-    <div class="grid grid-cols-1 lg:grid-cols-2 m-4 min-h-full">
-        <img src={$singlePaintingStore?.data?.content} alt={$singlePaintingStore?.data?.title} class="my-4 mx-auto w-full"/>
-        <div>
-            <div>
-                <header class="card-header text-center font-bold">{$singlePaintingStore?.data?.title}</header>
-                <div class="text-center">{$singlePaintingStore?.data?.artist?.name}</div>
-                <div class="w-56 m-3 mx-auto">
+<article class="card m-8 p-4 min-h-[90%]" data-testid="painting-detail" data-painting-id={$singlePaintingStore?.data?.id}>
+    <div class="grid grid-cols-1 lg:grid-cols-2 m-4 min-h-full" data-testid="painting-detail-grid">
+        <img src={$singlePaintingStore?.data?.content} alt={$singlePaintingStore?.data?.title} class="my-4 mx-auto w-full" data-testid="painting-photo"/>
+        <div data-testid="painting-detail-info">
+            <div data-testid="painting-detail-header">
+                <header class="card-header text-center font-bold" data-testid="painting-title">{$singlePaintingStore?.data?.title}</header>
+                <div class="text-center" data-testid="painting-artist">{$singlePaintingStore?.data?.artist?.name}</div>
+                <div class="w-56 m-3 mx-auto" data-testid="painting-edit-wrap">
                     <EditComponent
                             dataTestId="edit-painting"
                             {errorTrigger}
@@ -46,7 +46,7 @@
                     />
                 </div>
             </div>
-            <div class="m-4">{$singlePaintingStore?.data?.description}</div>
+            <div class="m-4" data-testid="painting-description">{$singlePaintingStore?.data?.description}</div>
         </div>
     </div>
 </article>

@@ -81,6 +81,7 @@
 <Modal />
 <AppShell>
 	<svelte:fragment slot="header">
+		<div data-testid="app-header">
 		<AppBar gridColumns="grid-cols-3" slotDefault="place-self-center" slotTrail="place-content-end" class="px-6">
 			<svelte:fragment slot="lead">
 				<MainTitle/>
@@ -96,10 +97,15 @@
 			</svelte:fragment>
 		</AppBar>
 		{#if isMenuVisible}
-			<PagesNavigation isBigScreen={false}/>
+			<div data-testid="mobile-menu">
+				<PagesNavigation isBigScreen={false}/>
+			</div>
 		{/if}
+		</div>
 	</svelte:fragment>
-	<slot/>
+	<div data-testid="page-content">
+		<slot/>
+	</div>
 </AppShell>
 <Toast />
 

@@ -26,12 +26,13 @@
 </script>
 
 {#if hasError}
-    <div class="alert variant-filled-error m-4 p-6">
-        <div class="alert-message">
-            <h3 class="h3 mb-2">Ошибка</h3>
-            <p class="mb-4">{errorMessage}</p>
+    <div class="alert variant-filled-error m-4 p-6" data-testid="error-boundary">
+        <div class="alert-message" data-testid="error-boundary-message-box">
+            <h3 class="h3 mb-2" data-testid="error-boundary-title">Ошибка</h3>
+            <p class="mb-4" data-testid="error-boundary-message">{errorMessage}</p>
             <button 
                 class="btn variant-filled"
+                data-testid="error-boundary-reload"
                 on:click={handleReload}
             >
                 Перезагрузить страницу
