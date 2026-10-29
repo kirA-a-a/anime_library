@@ -14,6 +14,7 @@
 			store={paintingsStore}
 			loadFunction={apiClient.loadPaintings}
 			addButtonName="Добавить картину"
+			addButtonTestId="add-painting-button"
 			pageTitle="Картины"
 			searchPlaceholder="Искать картины..."
 			formComponent={NewPaintingForm}

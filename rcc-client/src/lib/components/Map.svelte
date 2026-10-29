@@ -49,4 +49,4 @@
 </script>
 
 
-<div class="map" style="height:100%;width:100%" use:mapAction />
+<div class="map" style="height:100%;width:100%" data-testid="map" use:mapAction />

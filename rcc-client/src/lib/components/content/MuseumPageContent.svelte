@@ -24,12 +24,12 @@
 
 </script>
 
-<article class="card m-8 p-4 min-h-[90%]">
-    <div class="grid grid-cols-1 lg:grid-cols-2 m-4 min-h-full">
-        <div>
-            <header class="card-header text-center font-bold">{$singleMuseumStore.data?.title}</header>
-            <div class="text-center">{$singleMuseumStore.data?.geo.country.name}, {$singleMuseumStore.data?.geo?.city}</div>
-            <div class="w-56 m-3 mx-auto">
+<article class="card m-8 p-4 min-h-[90%]" data-testid="museum-detail" data-museum-id={$singleMuseumStore.data?.id}>
+    <div class="grid grid-cols-1 lg:grid-cols-2 m-4 min-h-full" data-testid="museum-detail-grid">
+        <div data-testid="museum-detail-info">
+            <header class="card-header text-center font-bold" data-testid="museum-title">{$singleMuseumStore.data?.title}</header>
+            <div class="text-center" data-testid="museum-location">{$singleMuseumStore.data?.geo.country.name}, {$singleMuseumStore.data?.geo?.city}</div>
+            <div class="w-56 m-3 mx-auto" data-testid="museum-edit-wrap">
                 <EditComponent
                         dataTestId="edit-museum"
                         {errorTrigger}
@@ -43,8 +43,8 @@
                         dataKey="title"
                 />
             </div>
-            <div>{$singleMuseumStore.data?.description}</div>
+            <div data-testid="museum-description">{$singleMuseumStore.data?.description}</div>
         </div>
-        <img src={$singleMuseumStore.data?.photo} alt={$singleMuseumStore.data?.title} class="my-4 mx-auto w-full"/>
+        <img src={$singleMuseumStore.data?.photo} alt={$singleMuseumStore.data?.title} class="my-4 mx-auto w-full" data-testid="museum-photo"/>
     </div>
 </article>
