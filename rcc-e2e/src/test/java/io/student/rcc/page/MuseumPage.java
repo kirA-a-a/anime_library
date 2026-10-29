@@ -4,11 +4,9 @@ import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.attributeMatching;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
 
 import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import io.student.rcc.config.Config;
@@ -30,37 +28,58 @@ import org.openqa.selenium.Keys;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class MuseumPage extends BasePage<MuseumPage>{
+public class MuseumPage extends BasePage<MuseumPage> {
 
   private static final Config CFG = Config.getInstance();
   public static final String URL = CFG.frontUrl() + "museum";
-  private final Header header = new Header();
-  private final ElementsCollection museumListCards = $$("[data-testid='museum-card']");
-  private final SelenideElement
-      pageTitle = $("h2"),
-      addMuseumButton = $(By.xpath("//button[text()='Добавить музей']")),
-      editMuseumButton = $("[data-testid='edit-museum']"),
-      form = $("form.modal-form"),
-      titleInput = $("input[name='title']"),
-      cityInput = $("input[name='city']"),
-      descriptionInput = $("textarea[name='description']"),
-      countrySelect = $("select[name='countryId']"),
-      photoInput = $("input[name='photo']"),
-      submitButton = $("form.modal-form button[type='submit']"),
-      museumCard = $("article.card"),
-      museumTitle = museumCard.$("header.card-header"),
-      museumLocation = museumCard.$("header.card-header + div"),
-      museumDescription = museumCard.$("div.w-56 + div"),
-      museumPhoto = $("img.my-4");
+  private final Header header;
+  private final ElementsCollection museumListCards;
+  private final SelenideElement pageTitle;
+  private final SelenideElement addMuseumButton;
+  private final SelenideElement editMuseumButton;
+  private final SelenideElement form;
+  private final SelenideElement titleInput;
+  private final SelenideElement cityInput;
+  private final SelenideElement descriptionInput;
+  private final SelenideElement countrySelect;
+  private final SelenideElement photoInput;
+  private final SelenideElement submitButton;
+  private final SelenideElement museumCard;
+  private final SelenideElement museumTitle;
+  private final SelenideElement museumLocation;
+  private final SelenideElement museumDescription;
+  private final SelenideElement museumPhoto;
+
+  public MuseumPage(SelenideDriver driver) {
+    super(driver);
+    this.header = new Header(driver);
+    this.museumListCards = driver.$$("[data-testid='museum-card']");
+    this.pageTitle = driver.$("h2");
+    this.addMuseumButton = driver.$(By.xpath("//button[text()='Добавить музей']"));
+    this.editMuseumButton = driver.$("[data-testid='edit-museum']");
+    this.form = driver.$("form.modal-form");
+    this.titleInput = driver.$("input[name='title']");
+    this.cityInput = driver.$("input[name='city']");
+    this.descriptionInput = driver.$("textarea[name='description']");
+    this.countrySelect = driver.$("select[name='countryId']");
+    this.photoInput = driver.$("input[name='photo']");
+    this.submitButton = driver.$("form.modal-form button[type='submit']");
+    this.museumCard = driver.$("article.card");
+    this.museumTitle = museumCard.$("header.card-header");
+    this.museumLocation = museumCard.$("header.card-header + div");
+    this.museumDescription = museumCard.$("div.w-56 + div");
+    this.museumPhoto = driver.$("img.my-4");
+  }
 
   @Step("Открыть список музеев")
-  public static @Nonnull MuseumPage open() {
-    return Selenide.open(URL, MuseumPage.class);
+  public static @Nonnull MuseumPage open(SelenideDriver driver) {
+    driver.open(URL);
+    return new MuseumPage(driver);
   }
 
   @Step("Открыть страницу музея кликом по карточке: {museumId}")
-  public static @Nonnull MuseumPage open(UUID museumId) {
-    return open().openMuseumById(museumId);
+  public static @Nonnull MuseumPage open(SelenideDriver driver, UUID museumId) {
+    return open(driver).openMuseumById(museumId);
   }
 
   @Step("Открыть музей кликом по карточке: {museumId}")
@@ -160,7 +179,7 @@ public class MuseumPage extends BasePage<MuseumPage>{
 
   @Step("Проверить toast: {message}")
   public @Nonnull MuseumPage checkToast(String message) {
-    Toast.withMessage(message).shouldBeVisible();
+    Toast.withMessage(driver, message).shouldBeVisible();
     return this;
   }
 
@@ -180,7 +199,7 @@ public class MuseumPage extends BasePage<MuseumPage>{
 
   @Step("Проверить карточку музея: {title}")
   public @Nonnull MuseumPage checkMuseumCard(String title) {
-    ItemCard.byTitle(title).shouldBeVisible().shouldHaveTitle(title);
+    ItemCard.byTitle(driver, title).shouldBeVisible().shouldHaveTitle(title);
     return this;
   }
 
@@ -188,7 +207,7 @@ public class MuseumPage extends BasePage<MuseumPage>{
   public @Nonnull MuseumPage waitForMuseumPhotoLoaded() {
     museumPhoto.shouldBe(visible, Duration.ofSeconds(10));
     museumPhoto.shouldHave(attributeMatching("src", "data:image/.*"), Duration.ofSeconds(10));
-    Selenide.executeJavaScript(
+    driver.executeJavaScript(
         """
             const img = arguments[0];
             if (!img.complete || img.naturalWidth === 0) {

@@ -1,8 +1,8 @@
 package io.student.rcc.page.component;
 
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$;
 
+import com.codeborne.selenide.SelenideDriver;
 import io.qameta.allure.Step;
 import io.student.rcc.page.MuseumPage;
 import java.time.Duration;
@@ -13,8 +13,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @SuppressWarnings("UnusedReturnValue")
 public class Header extends BaseComponent<Header> {
 
-  public Header() {
-    super($(".app-bar"));
+  private final SelenideDriver driver;
+
+  public Header(SelenideDriver driver) {
+    super(driver.$(".app-bar"));
+    this.driver = driver;
   }
 
   @Step("Проверить наличие аватара в шапке")
@@ -26,6 +29,6 @@ public class Header extends BaseComponent<Header> {
   @Step("Перейти на страницу музеев из шапки")
   public @Nonnull MuseumPage toMuseums() {
     self.$("a[href='/museum']").shouldBe(visible).click();
-    return new MuseumPage();
+    return new MuseumPage(driver);
   }
 }

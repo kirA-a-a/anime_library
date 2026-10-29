@@ -1,8 +1,8 @@
 package io.student.rcc.page;
 
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$;
 
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import javax.annotation.Nonnull;
@@ -11,14 +11,24 @@ import org.openqa.selenium.By;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class RegisterPage extends BasePage<RegisterPage>{
+public class RegisterPage extends BasePage<RegisterPage> {
 
-  private final SelenideElement userNameInput = $("input[id='username']"),
-      passwordInput = $("input[id='password']"),
-      passwordSubmitInput = $("input[id='passwordSubmit']"),
-      submitBtn = $("button[type='submit']"),
-      signInBtn = $(By.xpath("//a[contains(text(), 'Войти в систему')]")),
-      userNameMessageError = $("span[class*='error__username')]");
+  private final SelenideElement userNameInput;
+  private final SelenideElement passwordInput;
+  private final SelenideElement passwordSubmitInput;
+  private final SelenideElement submitBtn;
+  private final SelenideElement signInBtn;
+  private final SelenideElement userNameMessageError;
+
+  public RegisterPage(SelenideDriver driver) {
+    super(driver);
+    this.userNameInput = driver.$("input[id='username']");
+    this.passwordInput = driver.$("input[id='password']");
+    this.passwordSubmitInput = driver.$("input[id='passwordSubmit']");
+    this.submitBtn = driver.$("button[type='submit']");
+    this.signInBtn = driver.$(By.xpath("//a[contains(text(), 'Войти в систему')]"));
+    this.userNameMessageError = driver.$("span[class*='error__username')]");
+  }
 
   @Step("Зарегистрировать пользователя: {userName}")
   public @Nonnull MainPage successRegistrationUser(String userName, String password) {
@@ -27,7 +37,7 @@ public class RegisterPage extends BasePage<RegisterPage>{
     passwordSubmitInput.setValue(password);
     submitBtn.click();
     signInBtn.shouldBe(visible).click();
-    return new MainPage();
+    return new MainPage(driver);
   }
 
   @Step("Зарегистрировать существующего пользователя: {userName}")

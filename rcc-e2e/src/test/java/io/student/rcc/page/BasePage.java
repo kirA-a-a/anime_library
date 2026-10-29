@@ -1,8 +1,8 @@
 package io.student.rcc.page;
 
 import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Selenide.$;
 
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
 
 /**
@@ -23,7 +23,7 @@ import com.codeborne.selenide.SelenideElement;
  *
  * <p>Как работает в тесте:
  * <pre>{@code
- * MainPage.open()
+ * MainPage.open(driver)
  *     .clickLoginButton()
  *     .login(user, password)
  *     .clickInProfile()
@@ -36,10 +36,17 @@ import com.codeborne.selenide.SelenideElement;
  */
 public abstract class BasePage<T extends BasePage<T>> {
 
+  protected final SelenideDriver driver;
+
   /**
    * Алерт лежит в BasePage, потому что он может появиться на любой странице.
    */
-  private final SelenideElement alert = $(".MuiAlert-message");
+  private final SelenideElement alert;
+
+  protected BasePage(SelenideDriver driver) {
+    this.driver = driver;
+    this.alert = driver.$(".MuiAlert-message");
+  }
 
   /**
    * Проверяет текст алерта и возвращает {@code this} как {@code T} для chaining.

@@ -3,8 +3,7 @@ package io.student.rcc.test.ui;
 import static io.student.rcc.utils.RandomUserDataUtils.randomUserName;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import com.codeborne.selenide.Selenide;
-import io.student.rcc.config.Config;
+import com.codeborne.selenide.SelenideDriver;
 import io.student.rcc.jupiter.annotation.Country;
 import io.student.rcc.jupiter.annotation.Museum;
 import io.student.rcc.jupiter.annotation.ScreenShotTest;
@@ -16,16 +15,19 @@ import io.student.rcc.page.MainPage;
 import io.student.rcc.page.MuseumPage;
 import io.student.rcc.page.ProfilePage;
 import io.student.rcc.utils.ScreenDiffResult;
+import io.student.rcc.utils.SelenideUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-@ExtendWith(BrowserExtension.class)
 public class ScreenshotTest {
 
-  private static final Config CFG = Config.getInstance();
   private static final String PASSWORD = "12345";
   private static final String MUSEUM_PHOTO = "images/museum-image.png";
+
+  @RegisterExtension
+  private final BrowserExtension browserExtension = new BrowserExtension();
+  private final SelenideDriver selenideDriver = new SelenideDriver(SelenideUtils.chromeConfig);
 
   @ScreenShotTest("images/expected-avatar.png")
   public void checkAvatar(BufferedImage expected) throws IOException {
@@ -33,7 +35,9 @@ public class ScreenshotTest {
 
     String userName = randomUserName();
 
-    Selenide.open(CFG.frontUrl(), MainPage.class)
+    browserExtension.getDrivers().add(selenideDriver);
+
+    MainPage.open(selenideDriver)
         .clickLoginButton()
         .clickRegistrationButton()
         .successRegistrationUser(userName, PASSWORD)
@@ -46,15 +50,15 @@ public class ScreenshotTest {
         .uploadAvatar("images/avatar.jpg")
         .saveAndClose();
 
-    new ProfilePage().checkToast("Профиль обновлен");
+    new ProfilePage(selenideDriver).checkToast("Профиль обновлен");
 
-    new MainPage()
+    new MainPage(selenideDriver)
         .clickInProfile()
         .waitForModalOpen()
         .shouldDisplayAvatar()
         .waitForAvatarLoaded();
 
-    BufferedImage actual = new ProfilePage().takeAvatarScreenshot();
+    BufferedImage actual = new ProfilePage(selenideDriver).takeAvatarScreenshot();
     assertFalse(new ScreenDiffResult(expected, actual), "Screen comparison failure");
   }
 
@@ -64,8 +68,9 @@ public class ScreenshotTest {
   )
   @ScreenShotTest("images/expected-museum-before-rewrite.png")
   public void checkMuseumAvatar(UserJson user, MuseumJson museum, BufferedImage expected) throws IOException {
+    browserExtension.getDrivers().add(selenideDriver);
 
-    MainPage.open()
+    MainPage.open(selenideDriver)
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .toMuseums()
@@ -76,7 +81,7 @@ public class ScreenshotTest {
         .checkToast("Обновлен музей: " + museum.title())
         .waitForMuseumPhotoLoaded();
 
-    BufferedImage actual = new MuseumPage().takeMuseumPhotoScreenshot();
+    BufferedImage actual = new MuseumPage(selenideDriver).takeMuseumPhotoScreenshot();
     assertFalse(new ScreenDiffResult(expected, actual), "Screen comparison failure");
   }
 

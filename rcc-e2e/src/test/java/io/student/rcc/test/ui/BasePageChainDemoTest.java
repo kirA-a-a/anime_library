@@ -5,13 +5,17 @@ import static io.student.rcc.utils.RandomUserDataUtils.randomMuseumTitle;
 import static io.student.rcc.utils.RandomUserDataUtils.randomName;
 import static io.student.rcc.utils.RandomUserDataUtils.randomSentence;
 
+import com.codeborne.selenide.SelenideDriver;
 import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.jupiter.annotation.meta.WebTest;
+import io.student.rcc.jupiter.extension.BrowserExtension;
 import io.student.rcc.model.UserJson;
 import io.student.rcc.page.BasePage;
 import io.student.rcc.page.MainPage;
+import io.student.rcc.utils.SelenideUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
  * Примеры chaining с {@link BasePage#checkAlertMessage(String)} — см. JavaDoc у {@link BasePage}.
@@ -23,6 +27,10 @@ public class BasePageChainDemoTest {
   private static final String PHOTO = "images/museum.png";
   private static final String COUNTRY = "Россия";
 
+  @RegisterExtension
+  private final BrowserExtension browserExtension = new BrowserExtension();
+  private final SelenideDriver selenideDriver = new SelenideDriver(SelenideUtils.chromeConfig);
+
   @Test
   @User
   @DisplayName("после редактирования профиля checkAlertMessage проверяет текст и сохраняет тип")
@@ -30,7 +38,9 @@ public class BasePageChainDemoTest {
     String firstname = randomName();
     String lastname = randomName();
 
-    MainPage.open()
+    browserExtension.getDrivers().add(selenideDriver);
+
+    MainPage.open(selenideDriver)
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .clickInProfile()
@@ -46,7 +56,9 @@ public class BasePageChainDemoTest {
     String city = randomCity();
     String description = randomSentence(8);
 
-    MainPage.open()
+    browserExtension.getDrivers().add(selenideDriver);
+
+    MainPage.open(selenideDriver)
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .toMuseums()
@@ -64,7 +76,9 @@ public class BasePageChainDemoTest {
     String city = randomCity();
     String description = randomSentence(8);
 
-    MainPage.open()
+    browserExtension.getDrivers().add(selenideDriver);
+
+    MainPage.open(selenideDriver)
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .toMuseums()

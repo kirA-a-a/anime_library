@@ -5,11 +5,9 @@ import static com.codeborne.selenide.Condition.disappear;
 import static com.codeborne.selenide.Condition.hidden;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
 
 import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import io.student.rcc.page.component.Toast;
@@ -27,12 +25,22 @@ import javax.imageio.ImageIO;
 @SuppressWarnings("UnusedReturnValue")
 public class ProfilePage extends BasePage<ProfilePage> {
 
-  private final SelenideElement form = $("form.modal-form"),
-      firstnameInput = $("input[name='firstname']"),
-      lastnameInput = $("input[name='surname']"),
-      submitButton = form.$("button[type='submit']"),
-      userTag = form.$("h4"),
-      chooseFileInput = form.$("input[type=file]");
+  private final SelenideElement form;
+  private final SelenideElement firstnameInput;
+  private final SelenideElement lastnameInput;
+  private final SelenideElement submitButton;
+  private final SelenideElement userTag;
+  private final SelenideElement chooseFileInput;
+
+  public ProfilePage(SelenideDriver driver) {
+    super(driver);
+    this.form = driver.$("form.modal-form");
+    this.firstnameInput = driver.$("input[name='firstname']");
+    this.lastnameInput = driver.$("input[name='surname']");
+    this.submitButton = form.$("button[type='submit']");
+    this.userTag = form.$("h4");
+    this.chooseFileInput = form.$("input[type=file]");
+  }
 
   @Step("Проверить username в профиле: {userTag}")
   public @Nonnull ProfilePage checkUserTag(String userTag) {
@@ -68,12 +76,12 @@ public class ProfilePage extends BasePage<ProfilePage> {
   @Step("Сохранить профиль и дождаться закрытия модалки")
   public @Nonnull MainPage saveAndClose() {
     save();
-    return new MainPage();
+    return new MainPage(driver);
   }
 
   @Step("Проверить toast: {message}")
   public @Nonnull ProfilePage checkToast(String message) {
-    Toast.withMessage(message).shouldBeVisible();
+    Toast.withMessage(driver, message).shouldBeVisible();
     return this;
   }
 
@@ -108,7 +116,7 @@ public class ProfilePage extends BasePage<ProfilePage> {
     avatar.shouldBe(visible, Duration.ofSeconds(10));
     avatar.shouldHave(attributeMatching("src", "data:image/.*"), Duration.ofSeconds(10));
 
-    Selenide.executeJavaScript(
+    driver.executeJavaScript(
         """
             const img = arguments[0];
             if (!img.complete || img.naturalWidth === 0) {
@@ -137,6 +145,6 @@ public class ProfilePage extends BasePage<ProfilePage> {
   }
 
   private @Nonnull SelenideElement visibleAvatar() {
-    return $$(".modal .avatar-image").find(Condition.visible);
+    return driver.$$(".modal .avatar-image").find(Condition.visible);
   }
 }

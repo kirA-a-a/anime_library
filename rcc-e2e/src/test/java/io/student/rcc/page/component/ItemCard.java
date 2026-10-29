@@ -2,8 +2,8 @@ package io.student.rcc.page.component;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$$;
 
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import javax.annotation.Nonnull;
@@ -18,8 +18,8 @@ public class ItemCard extends BaseComponent<ItemCard> {
   }
 
   @Step("Найти карточку по названию: {title}")
-  public static @Nonnull ItemCard byTitle(String title) {
-    return new ItemCard($$("ul.grid li").findBy(text(title)));
+  public static @Nonnull ItemCard byTitle(SelenideDriver driver, String title) {
+    return new ItemCard(driver.$$("ul.grid li").findBy(text(title)));
   }
 
   @Step("Проверить, что карточка видна")

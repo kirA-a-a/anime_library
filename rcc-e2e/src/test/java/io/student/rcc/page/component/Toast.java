@@ -2,8 +2,8 @@ package io.student.rcc.page.component;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$$;
 
+import com.codeborne.selenide.SelenideDriver;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import java.time.Duration;
@@ -19,8 +19,8 @@ public class Toast extends BaseComponent<Toast> {
   }
 
   @Step("Найти toast с текстом: {message}")
-  public static @Nonnull Toast withMessage(String message) {
-    return new Toast($$(".toast").findBy(text(message)));
+  public static @Nonnull Toast withMessage(SelenideDriver driver, String message) {
+    return new Toast(driver.$$(".toast").findBy(text(message)));
   }
 
   @Step("Проверить, что toast виден")
