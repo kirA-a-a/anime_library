@@ -77,11 +77,12 @@
 
 {#if $modalStore[0]}
 	<FormWrapper modalTitle="Редактировать картину" modalBody="">
-		<form class="modal-form space-y-4" on:submit={onSubmit}>
+		<form class="modal-form space-y-4" data-testid="painting-form" on:submit={onSubmit}>
 			<img
 				class="max-w-full rounded-lg object-cover w-full h-80"
 				src={painting.content}
 				alt={painting.title}
+				data-testid="painting-form-preview"
 			/>
 			<ImageInput
 				label="Обновить изображение картины"

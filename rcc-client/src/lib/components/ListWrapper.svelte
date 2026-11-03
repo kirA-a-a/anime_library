@@ -40,12 +40,12 @@
         {/if}
     {/if}
 {:else}
-    <div class="w-100">
+    <div class="w-100" data-testid="list-content">
         <slot/>
     </div>
 {/if}
 {#if !noMoreData}
-    <div use:viewport on:viewportenter={() => loadMore()}>
+    <div data-testid="list-load-more" use:viewport on:viewportenter={() => loadMore()}>
         {#if isLoading}
             <Loader/>
         {/if}
