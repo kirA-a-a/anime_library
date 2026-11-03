@@ -22,11 +22,7 @@ public class SessionController {
           Date.from(principal.getExpiresAt())
       );
     } else  {
-      return new SessionJson(
-          null,
-          null,
-          null
-      );
+      return SessionJson.empty();
     }
   }
 

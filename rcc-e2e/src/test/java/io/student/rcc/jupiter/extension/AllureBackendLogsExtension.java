@@ -4,6 +4,7 @@ import io.qameta.allure.Allure;
 import io.qameta.allure.AllureLifecycle;
 import io.qameta.allure.model.Status;
 import io.qameta.allure.model.TestResult;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
@@ -23,25 +24,20 @@ public class AllureBackendLogsExtension implements SuiteExtension {
     );
     allureLifecycle.startTestCase(caseId);
 
-    allureLifecycle.addAttachment(
-        "rcc-auth log",
-        "text/html",
-        ".log",
-        Files.newInputStream(
-            Path.of("./logs/rcc-auth/app.log")
-        )
-    );
-
-    allureLifecycle.addAttachment(
-        "rcc-api log",
-        "text/html",
-        ".log",
-        Files.newInputStream(
-            Path.of("./logs/rcc-api/app.log")
-        )
-    );
+    attachIfExists(allureLifecycle, "rcc-auth log", Path.of("./logs/rcc-auth/app.log"));
+    attachIfExists(allureLifecycle, "rcc-api log", Path.of("./logs/rcc-api/app.log"));
 
     allureLifecycle.stopTestCase(caseId);
     allureLifecycle.writeTestCase(caseId);
+  }
+
+  @SneakyThrows
+  private static void attachIfExists(AllureLifecycle lifecycle, String name, Path path) {
+    if (!Files.exists(path)) {
+      return;
+    }
+    try (InputStream inputStream = Files.newInputStream(path)) {
+      lifecycle.addAttachment(name, "text/html", ".log", inputStream);
+    }
   }
 }
