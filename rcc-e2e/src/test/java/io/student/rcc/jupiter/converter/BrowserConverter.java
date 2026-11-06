@@ -7,6 +7,11 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.ArgumentConverter;
 
+/**
+ * Конвертер {@link Browser} → {@link SelenideDriver} для нестатических UI-тестов.
+ *
+ * <p>Используется только в закомментированном {@code BrowserConverterTest}.
+ */
 public class BrowserConverter implements ArgumentConverter {
 
   @Override

@@ -1,11 +1,14 @@
 package io.student.rcc.page;
 
+
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
 import static io.student.rcc.condition.ButtonConditions.color;
 
 import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideDriver;
+import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import io.student.rcc.condition.Color;
@@ -16,36 +19,29 @@ import org.openqa.selenium.By;
 
 @ParametersAreNonnullByDefault
 @SuppressWarnings("UnusedReturnValue")
-public class MainPage extends BasePage<MainPage> {
+public class MainPage extends BasePage<MainPage>{
 
   public static final String URL = Config.getInstance().frontUrl();
-  private final SelenideElement loginInput;
-  private final SelenideElement pageContent;
-  private final SelenideElement avatar;
-  private final SelenideElement museumsLink;
-  private final SelenideElement themeSwitch;
-  private final ElementsCollection loginButtons;
 
-  public MainPage(SelenideDriver driver) {
-    super(driver);
-    this.loginInput = driver.$(By.xpath("//button[contains(text(), 'Войти')]"));
-    this.pageContent = driver.$("main[id='page-content']");
-    this.avatar = driver.$("figure[class*='avatar']");
-    this.museumsLink = driver.$("nav[aria-label='Основная навигация'] a[href='/museum']");
-    this.themeSwitch = driver.$("div.lightswitch-track[aria-label='Light Switch']");
-    this.loginButtons = driver.$$(By.xpath("//button[contains(text(), 'Войти')]"));
-  }
+  private final SelenideElement
+      loginInput = $(By.xpath("//button[contains(text(), 'Войти')]")),
+      pageContent = $("main[id='page-content']"),
+      avatar = $("figure[class*='avatar']"),
+      museumsLink = $("nav[aria-label='Основная навигация'] a[href='/museum']"),
+      themeSwitch = $("div.lightswitch-track[aria-label='Light Switch']");
+
+  private final ElementsCollection
+      loginButtons = $$(By.xpath("//button[contains(text(), 'Войти')]"));
 
   @Step("Открыть главную страницу")
-  public static @Nonnull MainPage open(SelenideDriver driver) {
-    driver.open(URL);
-    return new MainPage(driver);
+  public static @Nonnull MainPage open() {
+    return Selenide.open(URL, MainPage.class);
   }
 
   @Step("Нажать кнопку Войти")
   public @Nonnull AuthenticationPage clickLoginButton() {
     loginInput.click();
-    return new AuthenticationPage(driver);
+    return new AuthenticationPage();
   }
 
   @Step("Проверить цвет кнопки 'Войти' ")
@@ -69,18 +65,19 @@ public class MainPage extends BasePage<MainPage> {
   @Step("Проверить заголовок: {title}")
   public @Nonnull MainPage checkTitle(String title) {
     pageContent.shouldBe(text(title));
+
     return this;
   }
 
   @Step("Открыть профиль")
   public @Nonnull ProfilePage clickInProfile() {
     avatar.shouldBe(visible).click();
-    return new ProfilePage(driver);
+    return new ProfilePage();
   }
 
   @Step("Перейти на страницу музеев")
   public @Nonnull MuseumPage toMuseums() {
     museumsLink.shouldBe(visible).click();
-    return new MuseumPage(driver);
+    return new MuseumPage();
   }
 }

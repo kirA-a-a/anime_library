@@ -1,22 +1,17 @@
 package io.student.rcc.test.ui;
 
-import com.codeborne.selenide.SelenideDriver;
+import static io.student.rcc.data.rococoAuth.repository.iml.UserRepositoryHibernate.CFG;
+
+import com.codeborne.selenide.Selenide;
 import io.student.rcc.jupiter.annotation.Country;
 import io.student.rcc.jupiter.annotation.Museum;
 import io.student.rcc.jupiter.annotation.User;
-import io.student.rcc.jupiter.extension.BrowserExtension;
 import io.student.rcc.model.MuseumJson;
 import io.student.rcc.model.UserJson;
 import io.student.rcc.page.MainPage;
-import io.student.rcc.utils.SelenideUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class ConditionMuseumTest {
-
-  @RegisterExtension
-  private final BrowserExtension browserExtension = new BrowserExtension();
-  private final SelenideDriver selenideDriver = new SelenideDriver(SelenideUtils.chromeConfig);
 
   @Test
   @User(
@@ -24,9 +19,9 @@ public class ConditionMuseumTest {
       museums = @Museum
   )
   public void conditionMuseumTest(UserJson user, MuseumJson museum) {
-    browserExtension.getDrivers().add(selenideDriver);
 
-    MainPage.open(selenideDriver)
+    Selenide
+        .open(CFG.frontUrl(), MainPage.class)
         .toMuseums()
         .openMuseumById(museum.id());
 

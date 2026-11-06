@@ -1,14 +1,12 @@
 package io.student.rcc.jupiter.extension;
 
-import com.codeborne.selenide.SelenideDriver;
-import com.codeborne.selenide.logevents.LogEvent;
-import com.codeborne.selenide.logevents.LogEventListener;
+import com.codeborne.selenide.Configuration;
+import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.logevents.SelenideLogger;
 import io.qameta.allure.Allure;
 import io.qameta.allure.selenide.AllureSelenide;
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -20,41 +18,23 @@ import org.openqa.selenium.TakesScreenshot;
 public class BrowserExtension implements BeforeEachCallback, AfterEachCallback,
     TestExecutionExceptionHandler, LifecycleMethodExecutionExceptionHandler {
 
-  private final ThreadLocal<List<SelenideDriver>> drivers = ThreadLocal.withInitial(ArrayList::new);
-
-  public List<SelenideDriver> getDrivers() {
-    return drivers.get();
+  @Override
+  public void afterEach(ExtensionContext context) throws Exception {
+    if (WebDriverRunner.hasWebDriverStarted()) {
+      Selenide.closeWebDriver();
+    }
   }
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
+    Configuration.browser = "chrome";
+    Configuration.pageLoadStrategy = "eager";
+    Configuration.timeout = 5000L;
+
     SelenideLogger.addListener("Allure-selenide", new AllureSelenide()
         .savePageSource(false)
-        .screenshots(false)
+        .screenshots(true)
     );
-
-    SelenideLogger.addListener("selenide-driver-screenshot", new LogEventListener() {
-      @Override
-      public void afterEvent(LogEvent event) {
-        if (event.getStatus() == LogEvent.EventStatus.FAIL) {
-          doScreenshot();
-        }
-      }
-
-      @Override
-      public void beforeEvent(LogEvent currentLog) {
-      }
-    });
-  }
-
-  @Override
-  public void afterEach(ExtensionContext context) throws Exception {
-    for (SelenideDriver driver : getDrivers()) {
-      if (driver.hasWebDriverStarted()) {
-        driver.close();
-      }
-    }
-    drivers.remove();
   }
 
   @Override
@@ -71,18 +51,14 @@ public class BrowserExtension implements BeforeEachCallback, AfterEachCallback,
     throw throwable;
   }
 
-  private void doScreenshot() {
-    for (SelenideDriver driver : getDrivers()) {
-      if (driver.hasWebDriverStarted()) {
-        Allure.addAttachment(
-            "Screen on fail for browser: '%s'".formatted(driver.getSessionId()),
-            "image/png",
-            new ByteArrayInputStream(
-                ((TakesScreenshot) driver.getWebDriver()).getScreenshotAs(OutputType.BYTES)
-            ),
-            "png"
-        );
-      }
+  private static void doScreenshot() {
+    if (WebDriverRunner.hasWebDriverStarted()) {
+      Allure.addAttachment(
+          "Screen on fail",
+          new ByteArrayInputStream(
+              ((TakesScreenshot) WebDriverRunner.getWebDriver()).getScreenshotAs(OutputType.BYTES)
+          )
+      );
     }
   }
 }

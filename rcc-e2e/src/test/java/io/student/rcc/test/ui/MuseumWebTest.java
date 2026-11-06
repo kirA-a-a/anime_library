@@ -5,20 +5,16 @@ import static io.student.rcc.utils.RandomUserDataUtils.randomMuseumTitle;
 import static io.student.rcc.utils.RandomUserDataUtils.randomName;
 import static io.student.rcc.utils.RandomUserDataUtils.randomSentence;
 
-import com.codeborne.selenide.SelenideDriver;
 import io.student.rcc.jupiter.annotation.Country;
 import io.student.rcc.jupiter.annotation.Museum;
 import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.jupiter.annotation.meta.WebTest;
-import io.student.rcc.jupiter.extension.BrowserExtension;
 import io.student.rcc.model.MuseumJson;
 import io.student.rcc.model.UserJson;
 import io.student.rcc.page.MainPage;
 import io.student.rcc.page.component.Header;
-import io.student.rcc.utils.SelenideUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -29,10 +25,6 @@ public class MuseumWebTest {
   private static final String PHOTO = "images/museum.png";
   private static final String COUNTRY = "Россия";
 
-  @RegisterExtension
-  private final BrowserExtension browserExtension = new BrowserExtension();
-  private final SelenideDriver selenideDriver = new SelenideDriver(SelenideUtils.chromeConfig);
-
   @Test
   @User
   @DisplayName("Авторизованный пользователь редактирует профиль и видит toast об успешном обновлении")
@@ -40,9 +32,7 @@ public class MuseumWebTest {
     String firstname = randomName();
     String lastname = randomName();
 
-    browserExtension.getDrivers().add(selenideDriver);
-
-    MainPage.open(selenideDriver)
+    MainPage.open()
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .clickInProfile()
@@ -58,9 +48,7 @@ public class MuseumWebTest {
     String city = randomCity();
     String description = randomSentence(8);
 
-    browserExtension.getDrivers().add(selenideDriver);
-
-    MainPage.open(selenideDriver)
+    MainPage.open()
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .toMuseums()
@@ -81,9 +69,7 @@ public class MuseumWebTest {
     String newCity = randomCity();
     String newDescription = randomSentence(8);
 
-    browserExtension.getDrivers().add(selenideDriver);
-
-    MainPage.open(selenideDriver)
+    MainPage.open()
         .clickLoginButton()
         .login(user.username(), PASSWORD)
         .toMuseums()
@@ -109,13 +95,11 @@ public class MuseumWebTest {
       String expectedError,
       UserJson user
   ) {
-    browserExtension.getDrivers().add(selenideDriver);
-
-    MainPage.open(selenideDriver)
+    MainPage.open()
         .clickLoginButton()
         .login(user.username(), PASSWORD);
 
-    new Header(selenideDriver).toMuseums()
+    new Header().toMuseums()
         .openCreateMuseumForm()
         .setTitle(title)
         .selectCountry(COUNTRY)

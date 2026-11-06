@@ -37,7 +37,7 @@ configurations.configureEach {
 
 dependencies {
     // WEB
-    testImplementation "com.codeborne:selenide-core:${selenideVersion}"
+    testImplementation "com.codeborne:selenide:${selenideVersion}"
 
     // Allure
     testImplementation platform("io.qameta.allure:allure-bom:$allureVersion")

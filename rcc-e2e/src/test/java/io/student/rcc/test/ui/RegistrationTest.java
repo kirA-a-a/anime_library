@@ -2,31 +2,24 @@ package io.student.rcc.test.ui;
 
 import static io.student.rcc.utils.RandomUserDataUtils.randomUserName;
 
-import com.codeborne.selenide.SelenideDriver;
+import com.codeborne.selenide.Selenide;
+import io.student.rcc.config.Config;
 import io.student.rcc.jupiter.annotation.User;
-import io.student.rcc.jupiter.extension.BrowserExtension;
 import io.student.rcc.model.UserJson;
 import io.student.rcc.page.MainPage;
-import io.student.rcc.utils.SelenideUtils;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 
 public class RegistrationTest {
 
+  private static final Config CFG = Config.getInstance();
   private static final String PASSWORD = "12345";
-
-  @RegisterExtension
-  private final BrowserExtension browserExtension = new BrowserExtension();
-  private final SelenideDriver selenideDriver = new SelenideDriver(SelenideUtils.chromeConfig);
 
   @Test
   public void mainPageShouldBeDisplayedAfterSuccessLogin() {
     final String TITLE = "Ваши любимые картины и художники всегда рядом";
     String userName = randomUserName();
 
-    browserExtension.getDrivers().add(selenideDriver);
-
-    MainPage.open(selenideDriver)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .successRegistrationUser(userName, PASSWORD)
@@ -40,9 +33,7 @@ public class RegistrationTest {
   @Test
   @User
   public void shouldNotRegisterUserWithExistingUsername(UserJson user) {
-    browserExtension.getDrivers().add(selenideDriver);
-
-    MainPage.open(selenideDriver)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .unSuccessRegister(user.username(), PASSWORD);
@@ -51,9 +42,7 @@ public class RegistrationTest {
   @Test
   @User
   public void shouldShowErrorIfPasswordAndConfirmPasswordAreNotEqual(UserJson user) {
-    browserExtension.getDrivers().add(selenideDriver);
-
-    MainPage.open(selenideDriver)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .incorrectLogin(user.username(), PASSWORD + "12345");
   }
@@ -62,9 +51,7 @@ public class RegistrationTest {
   public void shouldRegisterNewUser() {
     String userName = randomUserName();
 
-    browserExtension.getDrivers().add(selenideDriver);
-
-    MainPage.open(selenideDriver)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .clickRegistrationButton()
         .successRegistrationUser(userName, PASSWORD)
@@ -74,9 +61,8 @@ public class RegistrationTest {
   @Test
   @User
   public void userShouldStayOnLoginPageAfterLoginWithBadCredentials(UserJson user) {
-    browserExtension.getDrivers().add(selenideDriver);
 
-    MainPage.open(selenideDriver)
+    Selenide.open(CFG.frontUrl(), MainPage.class)
         .clickLoginButton()
         .incorrectLogin(user.username() + "Test", PASSWORD);
   }

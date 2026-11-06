@@ -1,17 +1,29 @@
 package io.student.rcc.test.ui;
 
-import com.codeborne.selenide.SelenideDriver;
-import io.student.rcc.condition.Color;
-import io.student.rcc.jupiter.converter.BrowserConverter;
-import io.student.rcc.jupiter.extension.BrowserExtension;
-import io.student.rcc.page.MainPage;
-import io.student.rcc.utils.Browser;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.converter.ConvertWith;
-import org.junit.jupiter.params.provider.EnumSource;
-
+/**
+ * Тест написан под нестатическую конфигурацию Selenide ({@code SelenideDriver}).
+ *
+ * <p>Идея: {@code @EnumSource(Browser)} + {@code BrowserConverter} создаёт отдельный
+ * {@code SelenideDriver} на каждый браузер (Chrome / Firefox) в одном параметризованном тесте.
+ * Со статической {@code Configuration} один поток = один WebDriver, параллельный прогон
+ * нескольких браузеров так не выразить.
+ *
+ * <p>Чтобы снова включить — вернуть нестатический Selenide ({@code SelenideDriver} в page objects
+ * и {@code BrowserExtension#getDrivers()}).
+ */
 public class BrowserConverterTest {
+
+  /*
+  import com.codeborne.selenide.SelenideDriver;
+  import io.student.rcc.condition.Color;
+  import io.student.rcc.jupiter.converter.BrowserConverter;
+  import io.student.rcc.jupiter.extension.BrowserExtension;
+  import io.student.rcc.page.MainPage;
+  import io.student.rcc.utils.Browser;
+  import org.junit.jupiter.api.extension.RegisterExtension;
+  import org.junit.jupiter.params.ParameterizedTest;
+  import org.junit.jupiter.params.converter.ConvertWith;
+  import org.junit.jupiter.params.provider.EnumSource;
 
   @RegisterExtension
   static final BrowserExtension browserExtension = new BrowserExtension();
@@ -27,5 +39,5 @@ public class BrowserConverterTest {
         .clickThemeSwitch()
         .checkColorsLoginInput(Color.YELLOW);
   }
-
+  */
 }
