@@ -12,12 +12,12 @@
 </script>
 
 
-<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4">
+<ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 p-4" data-testid="painting-list">
     {#each paintings as painting(painting.id)}
-        <li class="relative">
-            <a href={`/painting/${painting?.id}`}>
+        <li class="relative" data-testid="painting-card-item" data-painting-id={painting.id}>
+            <a href={`/painting/${painting?.id}`} data-testid="painting-card" data-painting-id={painting.id}>
                 {#if !loadedImages.has(painting.id)}
-                    <div class="skeleton h-96 w-full rounded-lg"></div>
+                    <div class="skeleton h-96 w-full rounded-lg" data-testid="painting-card-skeleton"></div>
                 {/if}
                 <img 
                     class="max-w-full rounded-lg object-cover w-full h-96 transition-opacity duration-300"
@@ -28,8 +28,9 @@
                     alt={painting.title}
                     loading="lazy"
                     decoding="async"
+                    data-testid="painting-card-image"
                 >
-                <div class="text-center mt-2">{painting?.title}</div>
+                <div class="text-center mt-2" data-testid="painting-card-title">{painting?.title}</div>
             </a>
         </li>
     {/each}

@@ -40,7 +40,7 @@ spring:
               scopes:
                 - "openid"
                 - "profile"
-            require-authorization-consent: true
+            require-authorization-consent: false
             require-proof-key: true
             token-settings:
               access-token-time-to-live: 1800
@@ -76,6 +76,8 @@ spring:
     open-in-view: false
 
 logging:
+  file:
+    path: ./logs/rcc-auth
   level:
     root: INFO
     org.springframework.web: DEBUG
