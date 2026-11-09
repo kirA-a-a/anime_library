@@ -2,7 +2,6 @@ package io.student.rcc.test.api;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.student.rcc.api.AuthApiClient;
 import io.student.rcc.jupiter.annotation.User;
 import io.student.rcc.jupiter.extension.CookiesExtension;
@@ -43,12 +42,10 @@ public class OAuthTest {
     );
     String code = HttpUrl.parse(redirectResponse.headers().get("Location")).queryParameter("code");
 
-    String idToken = new ObjectMapper()
-        .readTree(
-            authApiClient.token(CLIENT_ID, REDIRECT_URI, "authorization_code", code, codeVerifier)
-                .body()
-                .string()
+    String idToken = authApiClient.token(
+            CLIENT_ID, REDIRECT_URI, "authorization_code", code, codeVerifier
         )
+        .body()
         .get("id_token")
         .asText();
 

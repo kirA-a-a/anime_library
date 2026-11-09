@@ -1,6 +1,7 @@
 package io.student.rcc.api;
 
 import static okhttp3.logging.HttpLoggingInterceptor.Level.BODY;
+import static okhttp3.logging.HttpLoggingInterceptor.Level.HEADERS;
 
 import io.qameta.allure.okhttp3.AllureOkHttp3;
 import io.student.rcc.api.core.ThreadSafeCookieStore;
@@ -36,6 +37,10 @@ public abstract class BaseRestClient {
 
   public BaseRestClient(String baseUrl, Converter.Factory factory) {
     this(baseUrl, false, factory, BODY);
+  }
+
+  public BaseRestClient(String baseUrl, boolean followRedirect, Interceptor... interceptors) {
+    this(baseUrl, followRedirect, JacksonConverterFactory.create(), HEADERS, interceptors);
   }
 
   public BaseRestClient(

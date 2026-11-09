@@ -18,7 +18,7 @@ public class ConditionMuseumTest {
       countries = @Country,
       museums = @Museum
   )
-  public void conditionMuseumTest(UserJson user, MuseumJson museum) {
+  public void conditionMuseumTest(MuseumJson museum) {
 
     Selenide
         .open(CFG.frontUrl(), MainPage.class)

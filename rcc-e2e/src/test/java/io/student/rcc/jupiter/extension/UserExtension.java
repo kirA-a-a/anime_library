@@ -24,7 +24,7 @@ public class UserExtension implements BeforeEachCallback, AfterEachCallback, Par
   public static ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(
       UserExtension.class);
   private final UsersClient client = new UsersDbClient();
-  private static final String DEFAULT_PASSWORD = "12345";
+  public static final String DEFAULT_PASSWORD = "12345";
 
   @Override
   public void beforeEach(ExtensionContext context) {
@@ -44,7 +44,7 @@ public class UserExtension implements BeforeEachCallback, AfterEachCallback, Par
               randomLastName(),
               null
           );
-          context.getStore(NAMESPACE).put(context.getUniqueId(), user);
+          setUser(user);
           context.getStore(TestData.NAMESPACE).put(
               context.getUniqueId(),
               TestData.empty().withUser(user)
@@ -66,8 +66,18 @@ public class UserExtension implements BeforeEachCallback, AfterEachCallback, Par
   }
 
   @Override
-  public @Nullable Object resolveParameter(ParameterContext parameterContext,
+  public @Nullable UserJson resolveParameter(ParameterContext parameterContext,
       ExtensionContext extensionContext) throws ParameterResolutionException {
-    return extensionContext.getStore(NAMESPACE).get(extensionContext.getUniqueId(), UserJson.class);
+    return getUserJson();
+  }
+
+  public static void setUser(UserJson testUser) {
+    final ExtensionContext context = TestMethodContextExtension.context();
+    context.getStore(NAMESPACE).put(context.getUniqueId(), testUser);
+  }
+
+  public static @Nullable UserJson getUserJson() {
+    final ExtensionContext context = TestMethodContextExtension.context();
+    return context.getStore(NAMESPACE).get(context.getUniqueId(), UserJson.class);
   }
 }

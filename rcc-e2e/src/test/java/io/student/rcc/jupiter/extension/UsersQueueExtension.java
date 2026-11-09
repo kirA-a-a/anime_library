@@ -105,6 +105,9 @@ public class UsersQueueExtension implements
   public void afterEach(ExtensionContext context) throws Exception {
     Map<Integer, StaticUser> map = context.getStore(NAMESPACE)
         .get(context.getUniqueId(), Map.class);
+    if (map == null) {
+      return;
+    }
 
     Parameter[] parameters = context.getRequiredTestMethod().getParameters();
 

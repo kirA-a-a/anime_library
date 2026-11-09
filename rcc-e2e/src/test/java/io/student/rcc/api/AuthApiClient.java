@@ -2,6 +2,7 @@ package io.student.rcc.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Objects;
 import javax.annotation.ParametersAreNonnullByDefault;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,7 @@ public class AuthApiClient extends BaseRestClient {
     }
   }
 
-  public Response<ResponseBody> token(
+  public Response<JsonNode> token(
       String clientId,
       String redirectUri,
       String grantType,

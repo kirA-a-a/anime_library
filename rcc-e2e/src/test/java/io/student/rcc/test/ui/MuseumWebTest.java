@@ -5,6 +5,7 @@ import static io.student.rcc.utils.RandomUserDataUtils.randomMuseumTitle;
 import static io.student.rcc.utils.RandomUserDataUtils.randomName;
 import static io.student.rcc.utils.RandomUserDataUtils.randomSentence;
 
+import io.student.rcc.jupiter.annotation.ApiLogin;
 import io.student.rcc.jupiter.annotation.Country;
 import io.student.rcc.jupiter.annotation.Museum;
 import io.student.rcc.jupiter.annotation.User;
@@ -12,6 +13,7 @@ import io.student.rcc.jupiter.annotation.meta.WebTest;
 import io.student.rcc.model.MuseumJson;
 import io.student.rcc.model.UserJson;
 import io.student.rcc.page.MainPage;
+import io.student.rcc.page.ProfilePage;
 import io.student.rcc.page.component.Header;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,13 +30,12 @@ public class MuseumWebTest {
   @Test
   @User
   @DisplayName("Авторизованный пользователь редактирует профиль и видит toast об успешном обновлении")
-  void shouldEditProfile(UserJson user) {
+  @ApiLogin
+  void shouldEditProfile() {
     String firstname = randomName();
     String lastname = randomName();
 
-    MainPage.open()
-        .clickLoginButton()
-        .login(user.username(), PASSWORD)
+    new MainPage()
         .clickInProfile()
         .editProfile(firstname, lastname)
         .checkToast("Профиль обновлен");
@@ -43,14 +44,13 @@ public class MuseumWebTest {
   @Test
   @User
   @DisplayName("Авторизованный пользователь создаёт музей и видит карточку с новым названием в списке")
-  void shouldCreateMuseum(UserJson user) {
+  @ApiLogin
+  void shouldCreateMuseum() {
     String title = randomMuseumTitle();
     String city = randomCity();
     String description = randomSentence(8);
 
-    MainPage.open()
-        .clickLoginButton()
-        .login(user.username(), PASSWORD)
+    new MainPage()
         .toMuseums()
         .checkPageTitle()
         .openCreateMuseumForm()
@@ -63,15 +63,14 @@ public class MuseumWebTest {
       countries = @Country,
       museums = @Museum
   )
+  @ApiLogin
   @DisplayName("Авторизованный пользователь открывает страницу музея и редактирует его данные")
-  void shouldEditMuseum(UserJson user, MuseumJson museum) {
+  void shouldEditMuseum(MuseumJson museum) {
     String newTitle = randomMuseumTitle();
     String newCity = randomCity();
     String newDescription = randomSentence(8);
 
-    MainPage.open()
-        .clickLoginButton()
-        .login(user.username(), PASSWORD)
+    new MainPage()
         .toMuseums()
         .openMuseumById(museum.id())
         .editMuseum(newTitle, COUNTRY, newCity, newDescription)
@@ -81,6 +80,7 @@ public class MuseumWebTest {
 
   @ParameterizedTest(name = "boundary: title={0}, description={1}, city={2}")
   @User
+  @ApiLogin
   @DisplayName("Форма создания музея показывает ошибки валидации на граничных значениях полей")
   @CsvSource({
       "ab, Valid museum description text, Paris, Название не может быть короче 3 символов",
@@ -92,13 +92,9 @@ public class MuseumWebTest {
       String title,
       String description,
       String city,
-      String expectedError,
-      UserJson user
-  ) {
-    MainPage.open()
-        .clickLoginButton()
-        .login(user.username(), PASSWORD);
-
+      String expectedError
+  )
+  {
     new Header().toMuseums()
         .openCreateMuseumForm()
         .setTitle(title)

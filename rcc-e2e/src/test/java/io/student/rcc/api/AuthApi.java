@@ -1,5 +1,6 @@
 package io.student.rcc.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import javax.annotation.ParametersAreNonnullByDefault;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -51,7 +52,7 @@ public interface AuthApi {
 
   @POST("/oauth2/token")
   @FormUrlEncoded
-  Call<ResponseBody> token(
+  Call<JsonNode> token(
       @Field("client_id") String clientId,
       @Field("redirect_uri") String redirectUri,
       @Field("grant_type") String grantType,

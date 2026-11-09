@@ -1,10 +1,8 @@
 package io.student.rcc.test.ui;
 
-import static io.student.rcc.utils.RandomUserDataUtils.randomUserName;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import com.codeborne.selenide.Selenide;
-import io.student.rcc.config.Config;
+import io.student.rcc.jupiter.annotation.ApiLogin;
 import io.student.rcc.jupiter.annotation.Country;
 import io.student.rcc.jupiter.annotation.Museum;
 import io.student.rcc.jupiter.annotation.ScreenShotTest;
@@ -23,26 +21,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(BrowserExtension.class)
 public class ScreenshotTest {
 
-  private static final Config CFG = Config.getInstance();
-  private static final String PASSWORD = "12345";
   private static final String MUSEUM_PHOTO = "images/museum-image.png";
 
+  @User
+  @ApiLogin
   @ScreenShotTest("images/expected-avatar.png")
-  public void checkAvatar(BufferedImage expected) throws IOException {
+  public void checkAvatar(UserJson user, BufferedImage expected) throws IOException {
     final String TITLE = "Ваши любимые картины и художники всегда рядом";
 
-    String userName = randomUserName();
-
-    Selenide.open(CFG.frontUrl(), MainPage.class)
-        .clickLoginButton()
-        .clickRegistrationButton()
-        .successRegistrationUser(userName, PASSWORD)
-        .clickLoginButton()
-        .login(userName, PASSWORD)
+    new MainPage()
         .checkTitle(TITLE)
         .clickInProfile()
         .waitForModalOpen()
-        .checkUserTag("@" + userName)
+        .checkUserTag("@" + user.username())
         .uploadAvatar("images/avatar.jpg")
         .saveAndClose();
 
@@ -62,12 +53,11 @@ public class ScreenshotTest {
       countries = @Country,
       museums = @Museum
   )
+  @ApiLogin
   @ScreenShotTest("images/expected-museum-before-rewrite.png")
-  public void checkMuseumAvatar(UserJson user, MuseumJson museum, BufferedImage expected) throws IOException {
+  public void checkMuseumAvatar(MuseumJson museum, BufferedImage expected) throws IOException {
 
-    MainPage.open()
-        .clickLoginButton()
-        .login(user.username(), PASSWORD)
+    new MainPage()
         .toMuseums()
         .openMuseumById(museum.id())
         .openEditMuseumForm()
