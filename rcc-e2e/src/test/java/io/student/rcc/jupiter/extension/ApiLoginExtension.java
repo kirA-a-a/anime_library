@@ -40,7 +40,7 @@ public class ApiLoginExtension implements BeforeEachCallback, AfterEachCallback,
     this.setupBrowser = setupBrowser;
   }
 
-  public static ApiLoginExtension apiLoginExtension() {
+  public static ApiLoginExtension rest() {
     return new ApiLoginExtension(false);
   }
 
@@ -86,7 +86,7 @@ public class ApiLoginExtension implements BeforeEachCallback, AfterEachCallback,
 
           if (setupBrowser) {
             open(CFG.frontUrl());
-            localStorage().setItem("id_token", getToken());
+            localStorage().setItem("id_token", token);
             WebDriverRunner.getWebDriver().manage().addCookie(getJsessionIdCookie());
             MainPage.open();
           }
@@ -119,7 +119,7 @@ public class ApiLoginExtension implements BeforeEachCallback, AfterEachCallback,
   }
 
   public static String getToken() {
-    return TestMethodContextExtension.context().getStore(NAMESPACE).get("token", String.class);
+    return "Bearer " + TestMethodContextExtension.context().getStore(NAMESPACE).get("token", String.class);
   }
 
   public static void setCode(String code) {

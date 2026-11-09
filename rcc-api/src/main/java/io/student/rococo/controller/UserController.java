@@ -1,7 +1,8 @@
 package io.student.rococo.controller;
 
 import io.student.rococo.model.UserJson;
-import java.util.UUID;
+import io.student.rococo.service.api.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,22 +15,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/user")
 public class UserController {
 
+  private final UserService userService;
+
+  @Autowired
+  public UserController(UserService userService) {
+    this.userService = userService;
+  }
+
   @GetMapping
   public UserJson getUser(@AuthenticationPrincipal Jwt principal) {
-    return new UserJson(
-        UUID.randomUUID(),
-        principal.getClaim("sub"),
-        "Ivan",
-        "Zaglushka",
-        ""
-    );
+    return userService.createNewUserIfNotPresent(principal.getClaim("sub"));
   }
 
   @PatchMapping
   public UserJson updateUser(
       @AuthenticationPrincipal Jwt principal, @RequestBody UserJson user
   ) {
-    return user;
+    return userService.update(
+        new UserJson(
+            user.id(),
+            principal.getClaim("sub"),
+            user.firstname(),
+            user.lastname(),
+            user.avatar()
+        )
+    );
   }
-
 }

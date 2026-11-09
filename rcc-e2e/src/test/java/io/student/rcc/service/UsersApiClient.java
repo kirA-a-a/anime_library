@@ -4,10 +4,10 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 
-import io.student.rcc.api.AuthApiClient;
 import io.student.rcc.api.BaseRestClient;
 import io.student.rcc.api.UserApiClient;
 import io.student.rcc.data.rococoAuth.entity.Authority;
+import io.student.rcc.jupiter.extension.ApiLoginExtension;
 import io.student.rcc.model.UserJson;
 import java.util.List;
 import java.util.Objects;
@@ -23,12 +23,14 @@ import org.jspecify.annotations.Nullable;
 @ParametersAreNonnullByDefault
 public class UsersApiClient extends BaseRestClient implements UsersClient {
 
-  private final AuthApiClient authApiClient;
+  private final io.student.rcc.api.AuthApiClient authApiClient;
+  private final AuthApiClient authLoginClient;
   private final UserApiClient userApiClient;
 
   public UsersApiClient() {
     super(CFG.apiUrl());
-    this.authApiClient = new AuthApiClient();
+    this.authApiClient = new io.student.rcc.api.AuthApiClient();
+    this.authLoginClient = new AuthApiClient();
     this.userApiClient = new UserApiClient();
   }
 
@@ -62,21 +64,13 @@ public class UsersApiClient extends BaseRestClient implements UsersClient {
 
   }
 
-  /**
-   * TODO: сейчас createUser не доходит до реального id через API.
-   * 1) userApiClient.getUser() бьёт в GET /api/user без Authorization → 401,
-   *    await крутится до таймаута. Нужен JWT (OAuth code+PKCE / login flow),
-   *    Bearer в UserApiClient (header или interceptor).
-   * 2) даже с JWT UserController#getUser — заглушка (UUID.randomUUID(),
-   *    хардкод имени), не userdata из БД и не стабильный id после register.
-   * Пока для тестов надёжнее UsersDbClient; этот метод — каркас register → poll.
-   */
   @Override
   public @NonNull UUID createUser(
       String username,
       String password
   ) {
     authApiClient.registerUser(username, password);
+    authLoginClient.login(username, password);
 
     AtomicReference<UserJson> currentUser = new AtomicReference<>();
 
@@ -84,8 +78,7 @@ public class UsersApiClient extends BaseRestClient implements UsersClient {
         .atMost(5, SECONDS)
         .pollInterval(100, MILLISECONDS)
         .until(() -> {
-          // TODO: getUser() пока всегда null — нет Bearer JWT → 401 на /api/user
-          UserJson userJson = userApiClient.getUser();
+          UserJson userJson = userApiClient.getUser(ApiLoginExtension.getToken());
           currentUser.set(userJson);
           return userJson != null && userJson.id() != null;
         });

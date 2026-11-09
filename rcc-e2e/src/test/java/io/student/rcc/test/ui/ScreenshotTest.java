@@ -7,7 +7,9 @@ import io.student.rcc.jupiter.annotation.Country;
 import io.student.rcc.jupiter.annotation.Museum;
 import io.student.rcc.jupiter.annotation.ScreenShotTest;
 import io.student.rcc.jupiter.annotation.User;
+import io.student.rcc.jupiter.extension.ApiLoginExtension;
 import io.student.rcc.jupiter.extension.BrowserExtension;
+import io.student.rcc.jupiter.extension.UserExtension;
 import io.student.rcc.model.MuseumJson;
 import io.student.rcc.model.UserJson;
 import io.student.rcc.page.MainPage;
@@ -17,11 +19,18 @@ import io.student.rcc.utils.ScreenDiffResult;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-@ExtendWith(BrowserExtension.class)
+@ExtendWith({
+    BrowserExtension.class,
+    UserExtension.class
+})
 public class ScreenshotTest {
 
   private static final String MUSEUM_PHOTO = "images/museum-image.png";
+
+  @RegisterExtension
+  private static final ApiLoginExtension apiLoginExtension = new ApiLoginExtension();
 
   @User
   @ApiLogin

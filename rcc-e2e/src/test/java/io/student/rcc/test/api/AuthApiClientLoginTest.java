@@ -8,8 +8,10 @@ import io.student.rcc.config.Config;
 import io.student.rcc.jupiter.annotation.ApiLogin;
 import io.student.rcc.jupiter.annotation.Token;
 import io.student.rcc.jupiter.annotation.User;
+import io.student.rcc.jupiter.extension.ApiLoginExtension;
 import io.student.rcc.jupiter.extension.BrowserExtension;
 import io.student.rcc.jupiter.extension.CookiesExtension;
+import io.student.rcc.jupiter.extension.UserExtension;
 import io.student.rcc.model.UserJson;
 import io.student.rcc.page.MainPage;
 import io.student.rcc.service.AuthApiClient;
@@ -19,7 +21,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-@ExtendWith(CookiesExtension.class)
+@ExtendWith({
+    CookiesExtension.class,
+    UserExtension.class
+})
 public class AuthApiClientLoginTest {
 
   private static final Config CFG = Config.getInstance();
@@ -31,6 +36,9 @@ public class AuthApiClientLoginTest {
 
   @RegisterExtension
   private final BrowserExtension browserExtension = new BrowserExtension();
+
+  @RegisterExtension
+  private static final ApiLoginExtension apiLoginExtension = new ApiLoginExtension();
 
   @BeforeAll
   static void createUserForApiLoginCredentials() {

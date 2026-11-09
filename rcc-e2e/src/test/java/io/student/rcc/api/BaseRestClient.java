@@ -31,6 +31,10 @@ public abstract class BaseRestClient {
     this(baseUrl, false, JacksonConverterFactory.create(), BODY);
   }
 
+  public BaseRestClient(String baseUrl, HttpLoggingInterceptor.Level level) {
+    this(baseUrl, false, JacksonConverterFactory.create(), level);
+  }
+
   public BaseRestClient(String baseUrl, boolean followRedirect) {
     this(baseUrl, followRedirect, JacksonConverterFactory.create(), BODY);
   }

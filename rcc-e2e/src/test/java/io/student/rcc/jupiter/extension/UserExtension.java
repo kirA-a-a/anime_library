@@ -33,6 +33,9 @@ public class UserExtension implements BeforeEachCallback, AfterEachCallback, Par
         User.class
     ).ifPresent(
         userAnnotation -> {
+          if (getUserJson() != null) {
+            return;
+          }
           String username = userAnnotation.username().isEmpty()
               ? randomUserName()
               : userAnnotation.username();
