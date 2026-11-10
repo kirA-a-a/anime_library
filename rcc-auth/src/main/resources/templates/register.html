@@ -5,51 +5,61 @@
     <link rel="icon" th:href="@{/images/favicon.ico}"/>
     <link th:href="@{/styles/styles.css}" rel="stylesheet" type="text/css"/>
 </head>
-<body>
-<main>
-    <div class="wrapper">
-        <section class="content">
+<body data-testid="register-body">
+<main data-testid="register-page">
+    <div class="wrapper" data-testid="register-wrapper">
+        <section class="content" data-testid="register-content">
             <form th:if="${username == null}" class="form" id="register-form" th:object="${registrationForm}"
                   action="/register" th:action="@{/register}"
-                  method="post">
-                <h1 class="form__header">Ro<span class="form__text_gold">coco</span></h1>
-                <label class="form__element">
-                    <span class="form__label">Имя пользователя</span>
-                    <span class="error__indicator error__username" th:if="${#fields.hasErrors('username')}"></span>
+                  method="post" data-testid="register-form">
+                <h1 class="form__header" data-testid="register-title">Ro<span class="form__text_gold" data-testid="register-title-accent">coco</span></h1>
+                <label class="form__element" data-testid="register-username-field">
+                    <span class="form__label" data-testid="register-username-label">Имя пользователя</span>
+                    <span class="error__indicator error__username" data-testid="register-error-indicator-username"
+                          th:if="${#fields.hasErrors('username')}"></span>
                     <input class="form__input" type="text" id="username" th:field="*{username}" name="username"
+                           data-testid="register-username"
                            placeholder="Введите имя пользователя..." required/>
-                    <span class="form__error error__username" th:if="${#fields.hasErrors('username')}"
+                    <span class="form__error error__username" data-testid="register-error-username"
+                          th:if="${#fields.hasErrors('username')}"
                           th:errors="*{username}"></span>
                 </label>
-                <label class="form__element">
-                    <span class="form__label">Пароль</span>
-                    <span class="error__indicator error__password" th:if="${#fields.hasErrors('password')}"></span>
+                <label class="form__element" data-testid="register-password-field">
+                    <span class="form__label" data-testid="register-password-label">Пароль</span>
+                    <span class="error__indicator error__password" data-testid="register-error-indicator-password"
+                          th:if="${#fields.hasErrors('password')}"></span>
                     <input class="form__input" type="password" id="password" name="password" th:field="*{password}"
+                           data-testid="register-password"
                            placeholder="Введите пароль..." required/>
-                    <span class="form__error error__password" th:if="${#fields.hasErrors('password')}"
+                    <span class="form__error error__password" data-testid="register-error-password"
+                          th:if="${#fields.hasErrors('password')}"
                           th:errors="*{password}"></span>
                 </label>
-                <label class="form__element">
-                    <span class="form__label">Повторите пароль</span>
-                    <span class="error__indicator error__passwordSubmit"
+                <label class="form__element" data-testid="register-password-submit-field">
+                    <span class="form__label" data-testid="register-password-submit-label">Повторите пароль</span>
+                    <span class="error__indicator error__passwordSubmit" data-testid="register-error-indicator-password-submit"
                           th:if="${#fields.hasErrors('passwordSubmit')}"></span>
                     <input class="form__input" type="password" id="passwordSubmit" name="passwordSubmit"
-                           th:field="*{passwordSubmit}" placeholder="Повторите пароль..." required/>
-                    <span class="form__error error__passwordSubmit" th:if="${#fields.hasErrors('passwordSubmit')}"
+                           th:field="*{passwordSubmit}" data-testid="register-password-submit"
+                           placeholder="Повторите пароль..." required/>
+                    <span class="form__error error__passwordSubmit" data-testid="register-error-password-submit"
+                          th:if="${#fields.hasErrors('passwordSubmit')}"
                           th:errors="*{passwordSubmit}"></span>
                 </label>
-                <button class="form__submit" type="submit">
+                <button class="form__submit" type="submit" data-testid="register-submit">
                     Зарегистрироваться
                 </button>
-                <p class="form__paragraph">Уже есть аккаунт? <a th:href="@{|${frontUri}|}" class="form__link">Войти</a>
+                <p class="form__paragraph" data-testid="register-login-hint">Уже есть аккаунт? <a th:href="@{|${frontUri}|}" class="form__link"
+                                                               data-testid="register-login-link">Войти</a>
                 </p>
             </form>
-            <div class="form" th:unless="${username == null}">
-                <p class="form__subheader">Добро пожаловать в Ro<span class="form__text_gold">coco</span></p>
-                <p class="form__paragraph"><a class="form__submit" th:href="@{|${frontUri}|}">Войти в систему</a></p>
+            <div class="form" th:unless="${username == null}" data-testid="register-success">
+                <p class="form__subheader" data-testid="register-success-message">Добро пожаловать в Ro<span class="form__text_gold" data-testid="register-success-accent">coco</span></p>
+                <p class="form__paragraph" data-testid="register-success-login-wrap"><a class="form__submit" th:href="@{|${frontUri}|}"
+                                              data-testid="register-success-login-link">Войти в систему</a></p>
             </div>
             <img class="content__image" src="../static/images/renuar.jpeg" width="90" th:src="@{/images/renuar.jpeg}"
-                 alt="Ренуар"/>
+                 alt="Ренуар" data-testid="register-side-image"/>
         </section>
     </div>
 </main>

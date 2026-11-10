@@ -16,6 +16,7 @@
 			store={museumsStore}
 			loadFunction={apiClient.loadMuseums}
 			addButtonName="Добавить музей"
+			addButtonTestId="add-museum-button"
 			pageTitle="Музеи"
 			searchPlaceholder="Искать музей..."
 			formComponent={NewMuseumForm}
