@@ -43,8 +43,8 @@ public class CountryServiceImpl implements CountryService {
   @Transactional(readOnly = true)
   public CountryJson findCountryById(String id) {
     return CountryJson.fromEntity(
-        getRequiredCountry(
-            UUID.fromString(id)
+        countryRepository.findByIdSwapped(id).orElseThrow(
+            () -> new ResourceNotFoundException(String.format("Страна не найдена по id: %s", id))
         )
     );
   }
@@ -56,7 +56,7 @@ public class CountryServiceImpl implements CountryService {
   }
 
   private CountryEntity getRequiredCountry(UUID id) {
-    return countryRepository.findById(id).orElseThrow(
+    return countryRepository.findByIdSwapped(id.toString()).orElseThrow(
         () -> new ResourceNotFoundException(String.format("Страна не найдена по id: %s", id))
     );
   }
