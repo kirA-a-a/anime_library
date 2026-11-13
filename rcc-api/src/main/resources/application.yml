@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: rococo-api
+  graphql:
+    graphiql:
+      enabled: true
   security:
     oauth2:
       resourceserver:
@@ -40,6 +43,8 @@ spring:
     open-in-view: false
 
 logging:
+  file:
+    path: ./logs/rcc-api
   level:
     root: INFO
     org.springframework.web: DEBUG

@@ -1,0 +1,4 @@
+io.student.rcc.jupiter.extension.CookiesExtension
+io.student.rcc.jupiter.extension.DatabasesExtension
+io.student.rcc.jupiter.extension.TestMethodContextExtension
+io.student.rcc.jupiter.extension.AllureBackendLogsExtension

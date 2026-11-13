@@ -1,0 +1,142 @@
+# --- Типы ответа (аналог DTO / *Json в REST) ---
+# scalar Date пока убран: graphql-datetime-starter 6.0.0 не совместим со Spring Boot 4.
+
+"""
+Страна. Соответствует CountryJson / GET /api/country.
+"""
+type Country {
+    "UUID страны"
+    id: ID
+    "Название страны"
+    name: String
+}
+
+"""
+Геопривязка музея: город + страна.
+Соответствует GeoJson внутри MuseumJson.
+"""
+type Geo {
+    "Город"
+    city: String
+    "Страна (вложенный объект)"
+    country: Country
+}
+
+"""
+Музей. Соответствует MuseumJson / /api/museum.
+"""
+type Museum {
+    "UUID музея"
+    id: ID
+    "Название музея"
+    title: String
+    "Описание"
+    description: String
+    "Фото (часто base64 / data-url, как в REST)"
+    photo: String
+    "Город и страна музея"
+    geo: Geo
+}
+
+"""
+Художник. Соответствует ArtistJson / /api/artist.
+"""
+type Artist {
+    "UUID художника"
+    id: ID
+    "Имя художника"
+    name: String
+    "Биография"
+    biography: String
+    "Фото / портрет"
+    photo: String
+}
+
+# --- Query: только чтение (аналог GET) ---
+
+"""
+Запросы на чтение 'Query'.
+"""
+type Query {
+    "Список стран. page/size — как на лекции (пока только в схеме)."
+    countries(title: String, page: Int, size: Int): CountryConnection
+
+    "Страна по id. Аналог GET /api/country/{id}"
+    country(id: ID!): Country
+
+    "Страна по имени. Аналог GET /api/country/name/{name}"
+    countryByName(name: String!): Country
+
+    "Список музеев. page/size — пагинация в схеме."
+    museums(title: String, page: Int, size: Int): MuseumConnection
+
+    "Музей по id. Аналог GET /api/museum/{id}"
+    museum(id: ID!): Museum
+
+    "Список художников. page/size — пагинация в схеме."
+    artists(name: String, page: Int, size: Int): ArtistConnection
+
+    "Художник по id. Аналог GET /api/artist/{id}"
+    artist(id: ID!): Artist
+}
+
+# --- Input: аргументы для Mutation (тело запроса, не путать с type) ---
+
+"""
+Входные данные страны (для geo у музея).
+input нельзя вернуть в ответе — только передать в mutation/query args.
+"""
+input CountryInput {
+    id: ID
+    name: String
+}
+
+"""
+Входные данные гео для создания/обновления музея.
+"""
+input GeoInput {
+    city: String
+    country: CountryInput
+}
+
+"""
+Тело create/update музея. Аналог @RequestBody MuseumJson.
+"""
+input MuseumInput {
+    "Нужен для update (PATCH)"
+    id: ID
+    title: String
+    description: String
+    photo: String
+    geo: GeoInput
+}
+
+"""
+Тело create/update художника. Аналог @RequestBody ArtistJson.
+"""
+input ArtistInput {
+    "Нужен для update (PATCH)"
+    id: ID
+    name: String
+    biography: String
+    photo: String
+}
+
+# --- Mutation: запись (аналог POST/PATCH). Country write-API в REST нет. ---
+
+"""
+Запросы, аналог запроса POST, но в graphQl, они называются 'Mutation', запросы меняющие что-то.
+"""
+type Mutation {
+    "Создать музей. Аналог POST /api/museum"
+    addMuseum(museum: MuseumInput!): Museum
+
+    "Обновить музей. Аналог PATCH /api/museum"
+    updateMuseum(museum: MuseumInput!): Museum
+
+    "Создать художника. Аналог POST /api/artist"
+    addArtist(artist: ArtistInput!): Artist
+
+    "Обновить художника. Аналог PATCH /api/artist"
+    updateArtist(artist: ArtistInput!): Artist
+}
