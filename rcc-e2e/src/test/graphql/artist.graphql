@@ -1,0 +1,43 @@
+query Artists($name: String, $page: Int, $size: Int) {
+  artists(name: $name, page: $page, size: $size) {
+    edges {
+      node {
+        id
+        name
+        biography
+        photo
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+
+query Artist($id: ID!) {
+  artist(id: $id) {
+    id
+    name
+    biography
+    photo
+  }
+}
+
+mutation AddArtist($artist: ArtistInput!) {
+  addArtist(artist: $artist) {
+    id
+    name
+    biography
+    photo
+  }
+}
+
+mutation UpdateArtist($artist: ArtistInput!) {
+  updateArtist(artist: $artist) {
+    id
+    name
+    biography
+    photo
+  }
+}

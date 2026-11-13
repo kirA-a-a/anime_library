@@ -26,6 +26,10 @@ public class RandomUserDataUtils {
     return FAKER.artist().name() + "_" + UUID.randomUUID().toString().substring(0, 8);
   }
 
+  public static @Nonnull String randomBiographyArtist() {
+    return FAKER.hobbit().location();
+  }
+
   public static @Nonnull String randomPaintingTitle() {
     return FAKER.book().title();
   }
