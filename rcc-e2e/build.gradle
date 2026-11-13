@@ -1,5 +1,6 @@
 plugins {
     id 'io.qameta.allure' version '3.0.1'
+    id 'com.apollographql.apollo' version '4.1.0'
 }
 
 group = 'io.student'
@@ -20,6 +21,12 @@ def simpleJndiVersion = '0.24.0'
 def springDataCommonsVersion = '3.5.1'
 def jakartaPersistenceVersion = '3.2.0'
 def okhttp3Version = '4.12.0'
+
+ext {
+    apiInspectionUrl = System.getProperty("test.env") == "docker"
+        ? "http://api.rcc.dc:8080/graphql"
+        : "http://127.0.0.1:8080/graphql"
+}
 
 configurations {
     agent {
@@ -84,6 +91,10 @@ dependencies {
     testImplementation "com.squareup.okhttp3:logging-interceptor:${okhttp3Version}"
     testImplementation "com.squareup.okhttp3:okhttp-urlconnection:${okhttp3Version}"
 
+    // GraphQL
+    testImplementation 'com.apollographql.java:client:0.0.2'
+    testImplementation 'com.apollographql.java:rx2:0.0.2'
+    testImplementation 'com.apollographql.adapters:apollo-adapters-core:0.0.4'
 
     // Lombok
     testCompileOnly 'org.projectlombok:lombok:1.18.36'
@@ -94,6 +105,34 @@ dependencies {
 
 allure {
     version = allureVersion
+}
+
+apollo {
+    service("rococo") {
+        generateKotlinModels.set(false)
+        packageName.set("io.student.rcc")
+        srcDir("src/test/graphql")
+        introspection {
+            endpointUrl.set(apiInspectionUrl)
+            schemaFile.set(file("src/test/graphql/schema.graphqls"))
+        }
+        outputDirConnection {
+            connectToJavaSourceSet("test")
+        }
+    }
+}
+
+sourceSets {
+    test {
+        java {
+            srcDir('src/test/java')
+            srcDir("$buildDir/generated/source/apollo/rococo")
+        }
+    }
+}
+
+tasks.named { it == "generateRococoApolloSources" }.configureEach {
+    dependsOn("downloadRococoApolloSchemaFromIntrospection")
 }
 
 test {
