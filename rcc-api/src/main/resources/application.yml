@@ -4,6 +4,14 @@ server:
 spring:
   application:
     name: rococo-api
+  autoconfigure:
+    exclude:
+      - org.springframework.grpc.autoconfigure.server.security.OAuth2ClientAutoConfiguration
+  grpc:
+    server:
+      servlet:
+        enabled: false
+      port: 9090
   graphql:
     graphiql:
       enabled: true
