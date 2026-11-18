@@ -4,6 +4,17 @@ server:
 spring:
   application:
     name: rococo-api
+  autoconfigure:
+    exclude:
+      - org.springframework.grpc.autoconfigure.server.security.OAuth2ClientAutoConfiguration
+  grpc:
+    server:
+      servlet:
+        enabled: false
+      port: 9090
+  graphql:
+    graphiql:
+      enabled: true
   security:
     oauth2:
       resourceserver:
@@ -40,6 +51,8 @@ spring:
     open-in-view: false
 
 logging:
+  file:
+    path: ./logs/rcc-api
   level:
     root: INFO
     org.springframework.web: DEBUG

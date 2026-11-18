@@ -4,9 +4,14 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 import com.codeborne.selenide.SelenideElement;
+import io.qameta.allure.Step;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import org.openqa.selenium.By;
 
-public class RegistrationPage {
+@ParametersAreNonnullByDefault
+@SuppressWarnings("UnusedReturnValue")
+public class RegisterPage extends BasePage<RegisterPage>{
 
   private final SelenideElement userNameInput = $("input[id='username']"),
       passwordInput = $("input[id='password']"),
@@ -15,7 +20,8 @@ public class RegistrationPage {
       signInBtn = $(By.xpath("//a[contains(text(), 'Войти в систему')]")),
       userNameMessageError = $("span[class*='error__username')]");
 
-  public MainPage successRegistrationUser(String userName, String password) {
+  @Step("Зарегистрировать пользователя: {userName}")
+  public @Nonnull MainPage successRegistrationUser(String userName, String password) {
     userNameInput.setValue(userName);
     passwordInput.setValue(password);
     passwordSubmitInput.setValue(password);
@@ -24,7 +30,8 @@ public class RegistrationPage {
     return new MainPage();
   }
 
-  public RegistrationPage unSuccessRegister(String userName, String password) {
+  @Step("Зарегистрировать существующего пользователя: {userName}")
+  public @Nonnull RegisterPage unSuccessRegister(String userName, String password) {
     userNameInput.setValue(userName);
     passwordInput.setValue(password);
     passwordSubmitInput.setValue(password);

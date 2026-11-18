@@ -5,37 +5,40 @@
     <link rel="icon" th:href="@{/images/favicon.ico}"/>
     <link th:href="@{/styles/styles.css}" rel="stylesheet" type="text/css"/>
 </head>
-<body>
-<main>
-    <div class="wrapper">
-        <section class="content">
-            <form class="form" action="#" th:action="@{/login}" method="post">
-                <h1 class="form__header">Ro<span class="form__text_gold">coco</span></h1>
-                <div th:if="${param.error}">
-                    <p class="form__error login__error">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+<body data-testid="login-body">
+<main data-testid="login-page">
+    <div class="wrapper" data-testid="login-wrapper">
+        <section class="content" data-testid="login-content">
+            <form class="form" action="#" th:action="@{/login}" method="post" data-testid="login-form">
+                <h1 class="form__header" data-testid="login-title">Ro<span class="form__text_gold" data-testid="login-title-accent">coco</span></h1>
+                <div th:if="${param.error}" data-testid="login-error-wrap">
+                    <p class="form__error login__error" data-testid="login-error">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
                 </div>
-                <div th:if="${param.logout}">
-                    <p class="text-warning">You have been logged out.</p>
+                <div th:if="${param.logout}" data-testid="login-logout-wrap">
+                    <p class="text-warning" data-testid="login-logout-message">You have been logged out.</p>
                 </div>
-                <label class="form__element">
-                    <span class="form__label">Имя пользователя</span>
-                    <input class="form__input" type="text" name="username" placeholder="Введите имя пользователя..."
+                <label class="form__element" data-testid="login-username-field">
+                    <span class="form__label" data-testid="login-username-label">Имя пользователя</span>
+                    <input class="form__input" type="text" name="username" data-testid="login-username"
+                           placeholder="Введите имя пользователя..."
                            required/>
                 </label>
-                <label class="form__element">
-                    <span class="form__label">Пароль</span>
-                    <input class="form__input" type="password" name="password" placeholder="Введите пароль..."
+                <label class="form__element" data-testid="login-password-field">
+                    <span class="form__label" data-testid="login-password-label">Пароль</span>
+                    <input class="form__input" type="password" name="password" data-testid="login-password"
+                           placeholder="Введите пароль..."
                            required/>
-                    <button type="button" class="form__password-button"></button>
+                    <button type="button" class="form__password-button" data-testid="login-password-toggle"></button>
                 </label>
-                <button class="form__submit" type="submit">
+                <button class="form__submit" type="submit" data-testid="login-submit">
                     Войти
                 </button>
-                <p class="form__paragraph">Нет аккаунта? <a th:href="@{/register}"
-                                                            class="form__link">Зарегистрироваться</a></p>
+                <p class="form__paragraph" data-testid="login-register-hint">Нет аккаунта? <a th:href="@{/register}"
+                                                            class="form__link"
+                                                            data-testid="login-register-link">Зарегистрироваться</a></p>
             </form>
             <img class="content__image" src="../static/images/hermitage.jpg" th:src="@{/images/hermitage.jpg}"
-                 alt="Эрмитаж"/>
+                 alt="Эрмитаж" data-testid="login-side-image"/>
         </section>
     </div>
 </main>

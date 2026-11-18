@@ -1,0 +1,14 @@
+query Countries($title: String, $page: Int!, $size: Int!) {
+  countries(title: $title, page: $page, size: $size) {
+    edges {
+      node {
+        id
+        name
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
