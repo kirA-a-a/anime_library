@@ -60,22 +60,22 @@ const clickProfileButton = () => {
 
 </script>
 
-<button type="button" class="block md:hidden shrink-0" on:click={toggleMenu}>
-    <img src={MenuIcon} alt="Иконка меню" class="w-50 h-50 md:hidden" width="50" height="50"/>
+<button type="button" class="block md:hidden shrink-0" data-testid="menu-button" on:click={toggleMenu}>
+    <img src={MenuIcon} alt="Иконка меню" class="w-50 h-50 md:hidden" width="50" height="50" data-testid="menu-icon"/>
 </button>
 <PagesNavigation isBigScreen={true}/>
-<div>
+<div data-testid="theme-switch">
     <LightSwitch rounded="rounded-full" on:click={toggleTheme}/>
 </div>
 {#if $sessionStore.isLoading}
-    <div class="placeholder-circle w-10" />
+    <div class="placeholder-circle w-10" data-testid="session-loading" />
 {:else}
     {#if $sessionStore.user}
-        <button type="button" class="btn-icon variant-filled-surface relative" on:click={clickProfileButton}>
-            <Avatar src={$sessionStore.user.avatar} width="w-16" rounded="rounded-full" />
+        <button type="button" class="btn-icon variant-filled-surface relative" data-testid="profile-button" on:click={clickProfileButton}>
+            <Avatar src={$sessionStore.user.avatar} width="w-16" rounded="rounded-full" data-testid="profile-avatar-header" />
         </button>
     {:else}
-        <button type="button" class="btn variant-filled-primary" on:click={onLoginClick}>
+        <button type="button" class="btn variant-filled-primary" data-testid="login-button" on:click={onLoginClick}>
             Войти
         </button>
     {/if}

@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package io.student.rococo.grpc;
+
+option java_multiple_files = true;
+option java_package = "io.student.rococo.grpc";
+option java_outer_classname = "RococoProto";
+
+// ========== Models ==========
+
+message Artist {
+  string id = 1;
+  string name = 2;
+  string biography = 3;
+  string photo = 4;
+}
+
+message Country {
+  string id = 1;
+  string name = 2;
+}
+
+message Geo {
+  string city = 1;
+  Country country = 2;
+}
+
+message Museum {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string photo = 4;
+  Geo geo = 5;
+}
+
+// ========== Artist ==========
+
+message ArtistsRequest {
+  string name = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message ArtistsResponse {
+  repeated Artist artists = 1;
+  int32 total_count = 2;
+}
+
+message ArtistByIdRequest {
+  string id = 1;
+}
+
+service ArtistService {
+  rpc GetArtists (ArtistsRequest) returns (ArtistsResponse);
+  rpc GetArtistById (ArtistByIdRequest) returns (Artist);
+  rpc CreateArtist (Artist) returns (Artist);
+  rpc UpdateArtist (Artist) returns (Artist);
+}
+
+// ========== Country ==========
+
+message CountriesRequest {
+  string title = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message CountriesResponse {
+  repeated Country countries = 1;
+  int32 total_count = 2;
+}
+
+message CountryByIdRequest {
+  string id = 1;
+}
+
+message CountryByNameRequest {
+  string name = 1;
+}
+
+service CountryService {
+  rpc GetCountries (CountriesRequest) returns (CountriesResponse);
+  rpc GetCountryById (CountryByIdRequest) returns (Country);
+  rpc GetCountryByName (CountryByNameRequest) returns (Country);
+  // Server streaming — страны потоком
+  rpc StreamCountries (CountriesRequest) returns (stream Country);
+}
+
+// ========== Museum ==========
+
+message MuseumsRequest {
+  string title = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message MuseumsResponse {
+  repeated Museum museums = 1;
+  int32 total_count = 2;
+}
+
+message MuseumByIdRequest {
+  string id = 1;
+}
+
+service MuseumService {
+  rpc GetMuseums (MuseumsRequest) returns (MuseumsResponse);
+  rpc GetMuseumById (MuseumByIdRequest) returns (Museum);
+  rpc CreateMuseum (Museum) returns (Museum);
+  rpc UpdateMuseum (Museum) returns (Museum);
+}

@@ -134,11 +134,13 @@
 </script>
 
 
-<article class="card m-6">
-    <header class="card-header text-center font-bold text-2xl">{$singleArtistStore?.data?.name}</header>
-    <section class="p-4 grid grid-cols-1 lg:grid-cols-3 justify-items-center">
-        <div class="flex flex-col">
-            <Avatar src={$singleArtistStore?.data?.photo} width="w-56" rounded="rounded-full" class="col-span-1"/>
+<article class="card m-6" data-testid="artist-detail" data-artist-id={$singleArtistStore?.data?.id}>
+    <header class="card-header text-center font-bold text-2xl" data-testid="artist-name">{$singleArtistStore?.data?.name}</header>
+    <section class="p-4 grid grid-cols-1 lg:grid-cols-3 justify-items-center" data-testid="artist-info">
+        <div class="flex flex-col" data-testid="artist-actions">
+            <div data-testid="artist-photo">
+                <Avatar src={$singleArtistStore?.data?.photo} width="w-56" rounded="rounded-full" class="col-span-1"/>
+            </div>
             {#if $sessionStore.user}
                 <EditComponent
                         {errorTrigger}
@@ -155,12 +157,12 @@
                            id: authorId,
                         }}
                 />
-                <button class="btn variant-filled-primary m-3 mx-auto block w-full" type="button" on:click={clickAddButton}>Добавить картину</button>
+                <button class="btn variant-filled-primary m-3 mx-auto block w-full" type="button" data-testid="artist-add-painting-button" on:click={clickAddButton}>Добавить картину</button>
             {/if}
         </div>
-        <p class="col-span-2 w-4/5 m-2">{$singleArtistStore?.data?.biography}</p>
+        <p class="col-span-2 w-4/5 m-2" data-testid="artist-biography">{$singleArtistStore?.data?.biography}</p>
     </section>
-    <section class="p-4">
+    <section class="p-4" data-testid="artist-paintings">
         <ListWrapper data={$singleArtistStore.paintings}
                      isSearchNotEmpty={false}
                      emptySearchText="Картины не найдены"

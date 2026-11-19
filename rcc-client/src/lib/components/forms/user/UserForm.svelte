@@ -75,12 +75,14 @@
 
 {#if $modalStore[0] && id}
 	<FormWrapper modalTitle={$modalStore[0].title ?? ''} modalBody={$modalStore[0].body ?? ''}>
-		<form class="modal-form space-y-4 relative" on:submit={onSubmit}>
-			<div class="text-right absolute right-0">
-				<button type="button" class="btn variant-ghost" on:click={onLogoutClick}> Выйти </button>
+		<form class="modal-form space-y-4 relative" data-testid="profile-form" on:submit={onSubmit}>
+			<div class="text-right absolute right-0" data-testid="profile-logout-wrap">
+				<button type="button" class="btn variant-ghost" data-testid="profile-logout-button" on:click={onLogoutClick}> Выйти </button>
 			</div>
-			<Avatar class="mx-auto" src={avatar} width="w-48" rounded="rounded-full" />
-			<h4 class="text-center">@{username}</h4>
+			<div data-testid="profile-avatar">
+				<Avatar class="mx-auto" src={avatar} width="w-48" rounded="rounded-full" />
+			</div>
+			<h4 class="text-center" data-testid="profile-username">@{username}</h4>
 			<ImageInput
 				label="Обновить фото профиля"
 				name="content"
@@ -101,7 +103,7 @@
 				bind:value={lastname}
 				error={$userFormErrorStore.lastname}
 			/>
-			<div class="text-center">
+			<div class="text-center" data-testid="profile-form-actions">
 				<ModalButtonGroup
 					onClose={parent.onClose}
 					submitButtonText="Обновить профиль"

@@ -3,8 +3,8 @@
     export let modalBody: string;
 </script>
 
-<div class="card p-4 w-modal shadow-xl space-y-4">
-    <header class="text-2xl font-bold">{modalTitle}</header>
-    <article>{modalBody}</article>
+<div class="card p-4 w-modal shadow-xl space-y-4" data-testid="modal-card">
+    <header class="text-2xl font-bold" data-testid="modal-title">{modalTitle}</header>
+    <article data-testid="modal-body">{modalBody}</article>
     <slot/>
 </div>
