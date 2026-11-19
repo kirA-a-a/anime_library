@@ -41,4 +41,9 @@ public enum DockerConfig implements Config {
   public @Nonnull String apiUrl() {
     return "";
   }
+
+  @Override
+  public @Nonnull String apiGrpcAddress() {
+    return "";
+  }
 }

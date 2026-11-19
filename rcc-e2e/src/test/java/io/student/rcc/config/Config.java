@@ -38,4 +38,11 @@ public interface Config {
 
   @Nonnull
   String apiUrl();
+
+  @Nonnull
+  String apiGrpcAddress();
+
+  default int apiGrpcPort(){
+    return 9090;
+  }
 }

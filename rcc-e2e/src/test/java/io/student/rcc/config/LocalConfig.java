@@ -41,4 +41,9 @@ public enum LocalConfig implements Config {
   public @Nonnull String apiUrl() {
     return "http://localhost:8080/";
   }
+
+  @Override
+  public @Nonnull String apiGrpcAddress() {
+    return "127.0.0.1";
+  }
 }
