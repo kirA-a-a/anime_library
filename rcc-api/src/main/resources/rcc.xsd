@@ -1,0 +1,240 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="rococo"
+           targetNamespace="rococo" elementFormDefault="qualified">
+
+    <!-- REQUEST TYPES -->
+    <!-- Аналог Java-классов аргументов (что метод принимает) -->
+    <!--
+      XSD шпаргалка по полям:
+      - type="xs:string" / xs:int  →  String / int
+      - без minOccurs/maxOccurs     →  по умолчанию minOccurs="1" maxOccurs="1" (обязательное поле)
+      - minOccurs="0"               →  поле опциональное (в Java = null)
+      - maxOccurs="unbounded"       →  список (в Java = List<T>)
+      - minOccurs="0" maxOccurs="unbounded" → List, может быть пустым
+    -->
+
+    <!-- java: class ArtistsRequest { String name; int page; int size; } -->
+    <xs:element name="artistsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- опционально: фильтр по имени, можно не передавать -->
+                <xs:element name="name" type="xs:string" minOccurs="0"/>
+                <!-- обязательно: номер страницы -->
+                <xs:element name="page" type="xs:int"/>
+                <!-- обязательно: размер страницы -->
+                <xs:element name="size" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class ArtistByIdRequest { String id; } -->
+    <xs:element name="artistByIdRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- обязательно: id художника -->
+                <xs:element name="id" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class CreateArtistRequest { ArtistJson artist; } -->
+    <xs:element name="createArtistRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- обязательно: тело = DTO ArtistJson -->
+                <xs:element name="artist" type="tns:artist"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class UpdateArtistRequest { ArtistJson artist; } -->
+    <xs:element name="updateArtistRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- обязательно: тело = DTO ArtistJson -->
+                <xs:element name="artist" type="tns:artist"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class CountriesRequest { String title; int page; int size; } -->
+    <xs:element name="countriesRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- опционально: фильтр по title -->
+                <xs:element name="title" type="xs:string" minOccurs="0"/>
+                <xs:element name="page" type="xs:int"/>
+                <xs:element name="size" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class CountryByIdRequest { String id; } -->
+    <xs:element name="countryByIdRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class CountryByNameRequest { String name; } -->
+    <xs:element name="countryByNameRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class MuseumsRequest { String title; int page; int size; } -->
+    <xs:element name="museumsRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- опционально: фильтр по title -->
+                <xs:element name="title" type="xs:string" minOccurs="0"/>
+                <xs:element name="page" type="xs:int"/>
+                <xs:element name="size" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class MuseumByIdRequest { String id; } -->
+    <xs:element name="museumByIdRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class CreateMuseumRequest { MuseumJson museum; } -->
+    <xs:element name="createMuseumRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- обязательно: тело = DTO MuseumJson -->
+                <xs:element name="museum" type="tns:museum"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class UpdateMuseumRequest { MuseumJson museum; } -->
+    <xs:element name="updateMuseumRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- обязательно: тело = DTO MuseumJson -->
+                <xs:element name="museum" type="tns:museum"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- RESPONSE TYPES -->
+    <!-- Аналог Java-классов результата (что метод возвращает) -->
+
+    <!-- java: class ArtistsResponse { List<ArtistJson> artists; int totalCount; } -->
+    <xs:element name="artistsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- List<ArtistJson>: 0..N элементов (пустой список ок) -->
+                <xs:element name="artists" type="tns:artist" minOccurs="0" maxOccurs="unbounded"/>
+                <!-- обязательно: общее кол-во -->
+                <xs:element name="totalCount" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class ArtistResponse { ArtistJson artist; } -->
+    <xs:element name="artistResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- обязательно: один ArtistJson -->
+                <xs:element name="artist" type="tns:artist"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class CountriesResponse { List<CountryJson> countries; int totalCount; } -->
+    <xs:element name="countriesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- List<CountryJson>: 0..N -->
+                <xs:element name="countries" type="tns:country" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="totalCount" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class CountryResponse { CountryJson country; } -->
+    <xs:element name="countryResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="country" type="tns:country"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class MuseumsResponse { List<MuseumJson> museums; int totalCount; } -->
+    <xs:element name="museumsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- List<MuseumJson>: 0..N -->
+                <xs:element name="museums" type="tns:museum" minOccurs="0" maxOccurs="unbounded"/>
+                <xs:element name="totalCount" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- java: class MuseumResponse { MuseumJson museum; } -->
+    <xs:element name="museumResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="museum" type="tns:museum"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- CUSTOM TYPES (DTO) -->
+    <!-- Аналог Java record / DTO из io.student.rococo.model -->
+    <!-- type="tns:artist" = ссылка на complexType ниже (как тип поля в Java) -->
+
+    <!-- java: record ArtistJson(UUID id, String name, String biography, String photo) -->
+    <xs:complexType name="artist">
+        <xs:sequence>
+            <!-- id опционален для createArtistRequest (генерится сервером) -->
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="biography" type="xs:string"/>
+            <xs:element name="photo" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- java: record CountryJson(UUID id, String name) -->
+    <xs:complexType name="country">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string"/>
+            <xs:element name="name" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- java: record GeoJson(String city, CountryJson country) -->
+    <xs:complexType name="geo">
+        <xs:sequence>
+            <xs:element name="city" type="xs:string"/>
+            <!-- вложенный DTO: type="tns:country" = CountryJson -->
+            <xs:element name="country" type="tns:country"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- java: record MuseumJson(UUID id, String title, String description, String photo, GeoJson geo) -->
+    <xs:complexType name="museum">
+        <xs:sequence>
+            <!-- id опционален для createMuseumRequest (генерится сервером) -->
+            <xs:element name="id" type="xs:string" minOccurs="0"/>
+            <xs:element name="title" type="xs:string"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="photo" type="xs:string"/>
+            <!-- вложенный DTO: type="tns:geo" = GeoJson -->
+            <xs:element name="geo" type="tns:geo"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

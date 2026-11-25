@@ -73,7 +73,7 @@
 
 {#if $modalStore[0]}
 	<FormWrapper modalTitle={$modalStore[0].title ?? ''} modalBody={$modalStore[0].body ?? ''}>
-		<form class="modal-form space-y-4" on:submit={onSubmit}>
+		<form class="modal-form space-y-4" data-testid="painting-form" on:submit={onSubmit}>
 			<Input
 				label="Название картины"
 				name="title"

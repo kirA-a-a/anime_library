@@ -77,11 +77,12 @@
 
 {#if $modalStore[0]}
 	<FormWrapper modalTitle="Редактировать музей" modalBody="">
-		<form class="modal-form space-y-4" on:submit={onSubmit}>
+		<form class="modal-form space-y-4" data-testid="museum-form" on:submit={onSubmit}>
 			<img
 				class="max-w-full rounded-lg object-cover w-full h-80"
 				src={museum.photo}
 				alt={museum.title}
+				data-testid="museum-form-preview"
 			/>
 			<ImageInput
 				label="Изображение музея"
