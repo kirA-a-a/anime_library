@@ -28,6 +28,8 @@ subprojects {
         lombokVersion = '1.18.42'
         mysqlDriverVersion = '8.0.33'
         flywayVersion = '12.0.0'
+        jakartaJaxbVersion = '4.0.5'
+        wsdl4jVersion = '1.6.3'
     }
 
     dependencyManagement {

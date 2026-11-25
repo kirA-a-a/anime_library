@@ -61,3 +61,5 @@ logging:
 
 rococo-front:
   base-uri: 'http://localhost:3000'
+rococo-api:
+  base-uri: 'http://localhost:8080'
